@@ -4,334 +4,72 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scrum Poker</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #4f46e5;
-            --primary-hover: #4338ca;
-            --bg: #f3f4f6;
-            --card-bg: #ffffff;
-            --text: #1f2937;
-            --text-light: #6b7280;
-            --accent: #10b981;
-            --accent-hover: #059669;
-            --danger: #ef4444;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg);
-            color: var(--text);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            padding: 20px 15px;
-        }
-
-        .container {
-            width: 100%;
-            max-width: 520px;
-            background: var(--card-bg);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.01);
-        }
-
-        header {
-            text-align: center;
-            margin-bottom: 24px;
-        }
-
-        header h1 {
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--primary);
-            letter-spacing: -0.5px;
-        }
-
-        header p {
-            font-size: 14px;
-            color: var(--text-light);
-            margin-top: 4px;
-        }
-
-        .input-group {
-            margin-bottom: 16px;
-        }
-
-        label {
-            display: block;
-            font-size: 13px;
-            font-weight: 600;
-            margin-bottom: 6px;
-            color: var(--text);
-        }
-
-        input, textarea {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 10px;
-            font-size: 15px;
-            transition: border-color 0.2s, box-shadow 0.2s;
-            outline: none;
-            background: #f9fafb;
-        }
-
-        input:focus, textarea:focus {
-            border-color: var(--primary);
-            background: #fff;
-            box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
-        }
-
-        button {
-            width: 100%;
-            padding: 12px 18px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
-        }
-
-        button:hover {
-            background-color: var(--primary-hover);
-            transform: translateY(-1px);
-        }
-
-        button:active {
-            transform: translateY(0);
-        }
-
-        .btn-success {
-            background-color: var(--accent);
-            box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
-        }
-        .btn-success:hover { background-color: var(--accent-hover); }
-
-        .btn-danger {
-            background-color: transparent;
-            color: var(--danger);
-            border: 1.5px solid #fca5a5;
-            box-shadow: none;
-        }
-        .btn-danger:hover {
-            background-color: #fef2f2;
-        }
-
-        .box {
-            background: #f9fafb;
-            border: 1px solid #f3f4f6;
-            border-radius: 12px;
-            padding: 18px;
-            margin-bottom: 20px;
-        }
-
-        .box-title {
-            font-size: 15px;
-            font-weight: 600;
-            margin-bottom: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .task-card {
-            background: #eef2ff;
-            border: 1px solid #c7d2fe;
-            color: #3730a3;
-            padding: 14px;
-            border-radius: 10px;
-            font-weight: 600;
-            font-size: 16px;
-            margin-bottom: 16px;
-            text-align: center;
-        }
-
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 8px;
-            margin-top: 12px;
-        }
-
-        .poker-card {
-            aspect-ratio: 3/4;
-            background: white;
-            border: 2px solid #e5e7eb;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--text);
-            cursor: pointer;
-            transition: all 0.15s ease;
-            user-select: none;
-            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-        }
-
-        .poker-card:hover {
-            border-color: var(--primary);
-            color: var(--primary);
-            transform: translateY(-3px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .poker-card.selected {
-            background: var(--primary);
-            color: white;
-            border-color: var(--primary);
-            transform: translateY(-4px);
-            box-shadow: 0 6px 12px rgba(79, 70, 229, 0.3);
-        }
-
-        .players-list {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .player-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 14px;
-            background: white;
-            border: 1px solid #f3f4f6;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-
-        .badge {
-            font-size: 12px;
-            padding: 4px 8px;
-            border-radius: 20px;
-            font-weight: 600;
-        }
-
-        .badge-waiting { background: #fffbeeb; color: #d97706; }
-        .badge-ready { background: #ecfdf5; color: #059669; }
-        .badge-vote { background: #eef2ff; color: #4338ca; font-size: 15px; font-weight: 700; padding: 4px 12px; }
-        .badge-sm { background: #f3e8ff; color: #7e22ce; margin-left: 6px; font-size: 11px; }
-
-        .btn-group {
-            display: flex;
-            gap: 10px;
-            margin-top: 12px;
-        }
+        :root { --primary: #4f46e5; --bg: #f3f4f6; }
+        * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background-color: var(--bg); padding: 20px; display: flex; justify-content: center; }
+        .container { width: 100%; max-width: 500px; background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
+        button { background: var(--primary); color: white; border: none; font-weight: 600; cursor: pointer; }
+        .cards-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 15px; }
+        .poker-card { aspect-ratio: 3/4; border: 2px solid #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 700; }
+        .poker-card.selected { background: var(--primary); color: white; border-color: var(--primary); }
+        .player-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
     </style>
 </head>
 <body>
     <div class="container">
-        <header>
-            <h1>⚡ Scrum Poker</h1>
-            <p>Gyors és egyszerű becslés a csapatnak</p>
-        </header>
-        
-        <!-- Belépő képernyő -->
+        <h1>⚡ Scrum Poker</h1>
         <div id="login-screen">
-            <div class="input-group">
-                <label for="username-input">Megjelenítendő neved</label>
-                <input type="text" id="username-input" placeholder="Pl. Péter" autofocus>
-            </div>
-            <button onclick="joinGame()">Belépés a játékba</button>
+            <input type="text" id="username-input" placeholder="Neved...">
+            <button onclick="joinGame()">Belépés</button>
         </div>
-
-        <!-- Játék képernyő -->
         <div id="game-screen" style="display:none;">
-            
-            <!-- Scrum Master Panel -->
-            <div id="sm-panel" style="display:none;" class="box">
-                <div class="box-title">
-                    <span>👑 Scrum Master Vezérlő</span>
-                </div>
-                <div class="input-group">
-                    <label for="tasks-input">Feladatok listája (soronként egy)</label>
-                    <textarea id="tasks-input" rows="3" placeholder="1. Új gomb tervezése&#10;2. Adatbázis mentés javítása"></textarea>
-                </div>
+            <div id="sm-panel" style="display:none;">
+                <textarea id="tasks-input" rows="3" placeholder="Ide írd a feladatokat..."></textarea>
                 <button onclick="saveTasks()">Feladatok indítása</button>
-                <button onclick="resetGame()" class="btn-danger" style="margin-top: 8px;">Játék törlése / Újrakezdés</button>
+                <button onclick="resetGame()" style="background:red;">Új játék</button>
             </div>
-
-            <!-- Aktuális feladat és kártyák -->
             <div id="current-task-display" style="display:none;">
-                <div class="task-card" id="task-title">Aktuális feladat: -</div>
-                
-                <label>Válassz egy kártyát:</label>
+                <h3 id="task-title">Feladat: -</h3>
                 <div class="cards-grid" id="cards-container"></div>
-
-                <div class="btn-group" style="margin-bottom: 20px;">
-                    <button id="reveal-btn" onclick="revealVotes()" class="btn-success" style="display:none;">Szavazatok felfedése 👁️</button>
-                    <button id="next-btn" onclick="nextTask()" style="display:none;">Következő feladat ➡️</button>
+                <div style="display:flex; gap:5px; margin-top:10px;">
+                    <button id="reveal-btn" onclick="revealVotes()">Felfedés</button>
+                    <button id="next-btn" onclick="nextTask()">Következő</button>
                 </div>
             </div>
-
-            <!-- Játékosok és szavazatok -->
-            <div class="box">
-                <div class="box-title">
-                    <span>Résztvevők</span>
-                </div>
-                <div class="players-list" id="players-container"></div>
-            </div>
+            <h3>Résztvevők:</h3>
+            <div id="players-container"></div>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        let myName = '';
-        const fibValues = ['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'];
-
         function joinGame() {
             const name = document.getElementById('username-input').value.trim();
-            if (!name) return alert('Kérlek add meg a neved!');
-            myName = name;
+            if (!name) return alert('Add meg a neved!');
             socket.emit('join', name);
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
-            buildCards();
         }
 
-        // Enter lenyomására is lépjen be
-        document.getElementById('username-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') joinGame();
+        // Kártyák építése
+        const container = document.getElementById('cards-container');
+        ['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'].forEach(val => {
+            const div = document.createElement('div');
+            div.className = 'poker-card';
+            div.innerText = val;
+            div.onclick = () => {
+                document.querySelectorAll('.poker-card').forEach(c => c.classList.remove('selected'));
+                div.classList.add('selected');
+                socket.emit('vote', val);
+            };
+            container.appendChild(div);
         });
 
-        function buildCards() {
-            const container = document.getElementById('cards-container');
-            container.innerHTML = '';
-            fibValues.forEach(val => {
-                const div = document.createElement('div');
-                div.className = 'poker-card';
-                div.innerText = val;
-                div.onclick = () => {
-                    document.querySelectorAll('.poker-card').forEach(c => c.classList.remove('selected'));
-                    div.classList.add('selected');
-                    socket.emit('vote', val);
-                };
-                container.appendChild(div);
-            });
-        }
-
-        function saveTasks() {
-            const text = document.getElementById('tasks-input').value;
-            const tasks = text.split('\n');
-            socket.emit('addTasks', tasks);
-        }
-
+        function saveTasks() { socket.emit('addTasks', document.getElementById('tasks-input').value.split('\n')); }
         function revealVotes() { socket.emit('reveal'); }
         function nextTask() { socket.emit('nextTask'); }
         function resetGame() { socket.emit('resetGame'); }
@@ -339,43 +77,24 @@
         socket.on('state', (state) => {
             const me = state.players[socket.id];
             if (!me) return;
-
-            if (me.isSM) {
-                document.getElementById('sm-panel').style.display = 'block';
-            }
-
+            
+            if (me.isSM) document.getElementById('sm-panel').style.display = 'block';
+            
             const taskDisplay = document.getElementById('current-task-display');
             if (state.tasks.length > 0 && state.currentTaskIndex < state.tasks.length) {
                 taskDisplay.style.display = 'block';
-                document.getElementById('task-title').innerText = `(${state.currentTaskIndex + 1}/${state.tasks.length}) ${state.tasks[state.currentTaskIndex]}`;
-                
+                document.getElementById('task-title').innerText = state.tasks[state.currentTaskIndex];
                 if (me.isSM) {
                     document.getElementById('reveal-btn').style.display = 'block';
-                    document.getElementById('next-btn').style.display = state.currentTaskIndex < state.tasks.length - 1 ? 'block' : 'none';
+                    document.getElementById('next-btn').style.display = 'block';
                 }
-            } else {
-                taskDisplay.style.display = 'none';
             }
-
-            const playersContainer = document.getElementById('players-container');
-            playersContainer.innerHTML = '';
+            
+            const pContainer = document.getElementById('players-container');
+            pContainer.innerHTML = '';
             for (let id in state.players) {
                 const p = state.players[id];
-                const row = document.createElement('div');
-                row.className = 'player-item';
-                
-                let voteStatus = p.vote !== null 
-                    ? `<span class="badge badge-ready">✅ Szavazott</span>` 
-                    : `<span class="badge badge-waiting">⏳ Gondolkodik...</span>`;
-                
-                if (state.revealed && p.vote !== null) {
-                    voteStatus = `<span class="badge badge-vote">${p.vote}</span>`;
-                }
-
-                const smBadge = p.isSM ? `<span class="badge badge-sm">SM</span>` : '';
-
-                row.innerHTML = `<span><b>${p.name}</b>${smBadge}</span>${voteStatus}`;
-                playersContainer.appendChild(row);
+                pContainer.innerHTML += `<div class="player-item"><span>${p.name}</span><span>${(state.revealed && p.vote !== null) ? '<b>'+p.vote+'</b>' : (p.vote ? '✅' : '⏳')}</span></div>`;
             }
         });
     </script>
