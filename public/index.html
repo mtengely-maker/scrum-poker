@@ -10,91 +10,130 @@
         * { box-sizing: border-box; font-family: 'Inter', sans-serif; }
         body { background-color: var(--bg); padding: 20px; display: flex; justify-content: center; }
         .container { width: 100%; max-width: 500px; background: white; border-radius: 16px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; }
+        input, button { width: 100%; padding: 12px; margin-top: 10px; border-radius: 8px; border: 1px solid #ddd; font-size: 16px; outline: none; }
+        input:focus { border-color: var(--primary); }
         button { background: var(--primary); color: white; border: none; font-weight: 600; cursor: pointer; }
+        button:hover { background: #4338ca; }
         .cards-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; margin-top: 15px; }
-        .poker-card { aspect-ratio: 3/4; border: 2px solid #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 700; }
+        .poker-card { aspect-ratio: 3/4; border: 2px solid #ddd; border-radius: 8px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: 700; background: #fff; font-size: 18px; }
         .poker-card.selected { background: var(--primary); color: white; border-color: var(--primary); }
-        .player-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; }
+        .player-item { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid #eee; font-size: 15px; }
+        .box { background: #f9fafb; border: 1px solid #e5e7eb; padding: 15px; border-radius: 10px; margin-bottom: 15px; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>⚡ Scrum Poker</h1>
+        
+        <!-- Belépés -->
         <div id="login-screen">
-            <input type="text" id="username-input" placeholder="Neved...">
-            <button onclick="joinGame()">Belépés</button>
+            <p style="margin-top: 10px; color: #4b5563;">Add meg a neved a belépéshez:</p>
+            <input type="text" id="username-input" placeholder="Pl. Péter">
+            <button id="login-btn">Belépés a játékba</button>
         </div>
+
+        <!-- Játék felület -->
         <div id="game-screen" style="display:none;">
-            <div id="sm-panel" style="display:none;">
-                <textarea id="tasks-input" rows="3" placeholder="Ide írd a feladatokat..."></textarea>
-                <button onclick="saveTasks()">Feladatok indítása</button>
-                <button onclick="resetGame()" style="background:red;">Új játék</button>
+            <div id="sm-panel" class="box" style="display:none;">
+                <h3>👑 Scrum Master Panel</h3>
+                <textarea id="tasks-input" rows="3" placeholder="Feladat 1&#10;Feladat 2"></textarea>
+                <button id="start-tasks-btn">Feladatok indítása</button>
+                <button id="reset-btn" style="background:#ef4444; margin-top:5px;">Minden törlése / Új játék</button>
             </div>
-            <div id="current-task-display" style="display:none;">
-                <h3 id="task-title">Feladat: -</h3>
+
+            <div id="current-task-display" class="box" style="display:none;">
+                <h3 id="task-title" style="margin-bottom: 10px; color: #1f2937;">Feladat: -</h3>
+                <p style="font-size: 13px; color: #6b7280;">Válassz kártyát:</p>
                 <div class="cards-grid" id="cards-container"></div>
-                <div style="display:flex; gap:5px; margin-top:10px;">
-                    <button id="reveal-btn" onclick="revealVotes()">Felfedés</button>
-                    <button id="next-btn" onclick="nextTask()">Következő</button>
+                <div style="display:flex; gap:10px; margin-top:15px;">
+                    <button id="reveal-btn" style="display:none; background:#10b981;">Szavazatok felfedése</button>
+                    <button id="next-btn" style="display:none;">Következő feladat</button>
                 </div>
             </div>
-            <h3>Résztvevők:</h3>
-            <div id="players-container"></div>
+
+            <h3 style="margin-top: 15px; font-size: 16px;">Résztvevők:</h3>
+            <div id="players-container" style="margin-top: 5px;"></div>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        function joinGame() {
+
+        // Belépés gomb esemény
+        document.getElementById('login-btn').addEventListener('click', () => {
             const name = document.getElementById('username-input').value.trim();
-            if (!name) return alert('Add meg a neved!');
+            if (!name) {
+                alert('Kérlek add meg a neved!');
+                return;
+            }
             socket.emit('join', name);
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'block';
-        }
+        });
 
-        // Kártyák építése
+        // Enter gomb támogatás a neves mezőben
+        document.getElementById('username-input').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                document.getElementById('login-btn').click();
+            }
+        });
+
+        // Kártyák generálása
         const container = document.getElementById('cards-container');
         ['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'].forEach(val => {
             const div = document.createElement('div');
             div.className = 'poker-card';
             div.innerText = val;
-            div.onclick = () => {
+            div.addEventListener('click', () => {
                 document.querySelectorAll('.poker-card').forEach(c => c.classList.remove('selected'));
                 div.classList.add('selected');
                 socket.emit('vote', val);
-            };
+            });
             container.appendChild(div);
         });
 
-        function saveTasks() { socket.emit('addTasks', document.getElementById('tasks-input').value.split('\n')); }
-        function revealVotes() { socket.emit('reveal'); }
-        function nextTask() { socket.emit('nextTask'); }
-        function resetGame() { socket.emit('resetGame'); }
+        // Scrum Master gombok
+        document.getElementById('start-tasks-btn').addEventListener('click', () => {
+            const text = document.getElementById('tasks-input').value;
+            socket.emit('addTasks', text.split('\n'));
+        });
 
+        document.getElementById('reveal-btn').addEventListener('click', () => { socket.emit('reveal'); });
+        document.getElementById('next-btn').addEventListener('click', () => { socket.emit('nextTask'); });
+        document.getElementById('reset-btn').addEventListener('click', () => { socket.emit('resetGame'); });
+
+        // Játékállapot fogadása a szervertől
         socket.on('state', (state) => {
             const me = state.players[socket.id];
             if (!me) return;
             
-            if (me.isSM) document.getElementById('sm-panel').style.display = 'block';
+            if (me.isSM) {
+                document.getElementById('sm-panel').style.display = 'block';
+            }
             
             const taskDisplay = document.getElementById('current-task-display');
             if (state.tasks.length > 0 && state.currentTaskIndex < state.tasks.length) {
                 taskDisplay.style.display = 'block';
-                document.getElementById('task-title').innerText = state.tasks[state.currentTaskIndex];
+                document.getElementById('task-title').innerText = `(${state.currentTaskIndex + 1}/${state.tasks.length}) ${state.tasks[state.currentTaskIndex]}`;
+                
                 if (me.isSM) {
                     document.getElementById('reveal-btn').style.display = 'block';
-                    document.getElementById('next-btn').style.display = 'block';
+                    document.getElementById('next-btn').style.display = state.currentTaskIndex < state.tasks.length - 1 ? 'block' : 'none';
                 }
+            } else {
+                taskDisplay.style.display = 'none';
             }
             
             const pContainer = document.getElementById('players-container');
             pContainer.innerHTML = '';
             for (let id in state.players) {
                 const p = state.players[id];
-                pContainer.innerHTML += `<div class="player-item"><span>${p.name}</span><span>${(state.revealed && p.vote !== null) ? '<b>'+p.vote+'</b>' : (p.vote ? '✅' : '⏳')}</span></div>`;
+                let statusHtml = p.vote !== null ? '✅ Szavazott' : '⏳ Gondolkodik';
+                if (state.revealed && p.vote !== null) {
+                    statusHtml = `<b style="color:#4f46e5; font-size:16px;">${p.vote}</b>`;
+                }
+                pContainer.innerHTML += `<div class="player-item"><span><b>${p.name}</b> ${p.isSM ? '(SM)' : ''}</span><span>${statusHtml}</span></div>`;
             }
         });
     </script>
