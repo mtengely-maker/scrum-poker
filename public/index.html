@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scrum Poker</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f4f6f9; margin: 0; padding: 20px; color: #333; }
+        .container { max-width: 600px; margin: 0 auto; background: white; padding: 20px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #0052cc; }
+        input, textarea, button { width: 100%; padding: 10px; margin-top: 10px; border-radius: 5px; border: 1px solid #ccc; box-sizing: border-box; font-size: 16px; }
+        button { background: #0052cc; color: white; border: none; cursor: pointer; font-weight: bold; }
+        button:hover { background: #0040a1; }
+        .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 20px; }
+        .card { padding: 15px; font-size: 20px; background: #e3f2fd; border: 2px solid #90caf9; border-radius: 8px; text-align: center; cursor: pointer; font-weight: bold; }
+        .card:hover, .card.selected { background: #0052cc; color: white; border-color: #003d99; }
+        .players-list { margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px; }
+        .player-row { display: flex; justify-content: space-between; padding: 8px; background: #f9f9f9; margin-bottom: 5px; border-radius: 4px; }
+        .task-box { background: #fffbe6; border: 1px solid #ffe58f; padding: 15px; border-radius: 6px; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Scrum Poker</h1>
+        
+        <div id="login-screen">
+            <p>Add meg a neved a belépéshez:</p>
+            <input type="text" id="username-input" placeholder="Neved...">
+            <button onclick="joinGame()">Belépés</button>
+        </div>
+
+        <div id="game-screen" style="display:none;">
+            <div id="sm-panel" style="display:none;" class="task-box">
+                <h3>Scrum Master Vezérlő</h3>
+                <p>Írd be a feladatokat (soronként egyet):</p>
+                <textarea id="tasks-input" rows="4" placeholder="Feladat 1&#10;Feladat 2&#10;Feladat 3"></textarea>
+                <button onclick="saveTasks()">Feladatok rögzítése és Játék indítása</button>
+                <button onclick="resetGame()" style="background: #d9534f; margin-top: 5px;">Minden törlése / Új játék</button>
+            </div>
+
+            <div id="current-task-display" class="task-box" style="display:none;">
+                <h3 id="task-title">Aktuális feladat: -</h3>
+                <div class="cards" id="cards-container"></div>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button id="reveal-btn" onclick="revealVotes()" style="display:none;">Szavazatok felfedése</button>
+                    <button id="next-btn" onclick="nextTask()" style="display:none; background: #5cb85c;">Következő feladat</button>
+                </div>
+            </div>
+
+            <div class="players-list">
+                <h3>Résztvevők és Szavazatok:</h3>
+                <div id="players-container"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let myName = '';
+        const fibValues = ['0', '1', '2', '3', '5', '8', '13', '21', '?', '☕'];
+
+        function joinGame() {
+            const name = document.getElementById('username-input').value.trim();
+            if (!name) return alert('Kérlek add meg a neved!');
+            myName = name;
+            socket.emit('join', name);
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            buildCards();
+        }
+
+        function buildCards() {
+            const container = document.getElementById('cards-container');
+            container.innerHTML = '';
+            fibValues.forEach(val => {
+                const div = document.createElement('div');
+                div.className = 'card';
+                div.innerText = val;
+                div.onclick = () => {
+                    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+                    div.classList.add('selected');
+                    socket.emit('vote', val);
+                };
+                container.appendChild(div);
+            });
+        }
+
+        function saveTasks() {
+            const text = document.getElementById('tasks-input').value;
+            const tasks = text.split('\n');
+            socket.emit('addTasks', tasks);
+        }
+
+        function revealVotes() { socket.emit('reveal'); }
+        function nextTask() { socket.emit('nextTask'); }
+        function resetGame() { socket.emit('resetGame'); }
+
+        socket.on('state', (state) => {
+            const me = state.players[socket.id];
+            if (!me) return;
+
+            if (me.isSM) {
+                document.getElementById('sm-panel').style.display = 'block';
+            }
+
+            const taskDisplay = document.getElementById('current-task-display');
+            if (state.tasks.length > 0 && state.currentTaskIndex < state.tasks.length) {
+                taskDisplay.style.display = 'block';
+                document.getElementById('task-title').innerText = `Aktuális feladat (${state.currentTaskIndex + 1}/${state.tasks.length}): ${state.tasks[state.currentTaskIndex]}`;
+                
+                if (me.isSM) {
+                    document.getElementById('reveal-btn').style.display = 'block';
+                    document.getElementById('next-btn').style.display = state.currentTaskIndex < state.tasks.length - 1 ? 'block' : 'none';
+                }
+            } else {
+                taskDisplay.style.display = 'none';
+            }
+
+            const playersContainer = document.getElementById('players-container');
+            playersContainer.innerHTML = '';
+            for (let id in state.players) {
+                const p = state.players[id];
+                const row = document.createElement('div');
+                row.className = 'player-row';
+                
+                let voteStatus = p.vote !== null ? '✅ Szavazott' : '⏳ Gondolkodik';
+                if (state.revealed && p.vote !== null) {
+                    voteStatus = `<b>${p.vote}</b>`;
+                }
+
+                row.innerHTML = `<span>${p.name} ${p.isSM ? '(SM)' : ''}</span><span>${voteStatus}</span>`;
+                playersContainer.appendChild(row);
+            }
+        });
+    </script>
+</body>
+</html>
