@@ -5,23 +5,39 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scrum Poker Pro</title>
     <style>
-        :root { --primary: #6366f1; --primary-hover: #4f46e5; --bg: #0f172a; --panel: #1e293b; }
+        :root { --primary: #6366f1; --primary-hover: #4f46e5; --bg: #0f172a; --panel: #1e293b; --table: #065f46; }
         body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; height: 100vh; overflow: hidden; display: flex; }
+        
         .sidebar { width: 240px; background: var(--panel); padding: 15px; border-right: 1px solid #334155; overflow-y: auto; }
-        .container { flex-grow: 1; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: space-between; }
-        .controls { background: var(--panel); padding: 15px; border-radius: 10px; width: 100%; max-width: 500px; margin-bottom: 10px; }
-        .card { width: 50px; height: 65px; background: #334155; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; margin: 4px; font-weight: bold; border: 2px solid transparent; }
+        .container { flex-grow: 1; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
+        
+        .controls { background: var(--panel); padding: 10px; border-radius: 10px; width: 100%; max-width: 500px; text-align: center; }
+        
+        /* Asztal stílus */
+        .table-area { flex-grow: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center; }
+        .table-shape { width: 320px; height: 180px; background: var(--table); border-radius: 100px; border: 4px solid #047857; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); z-index: 1; }
+        
+        /* Játékosok az asztal körül */
+        .seat { position: absolute; display: flex; flex-direction: column; align-items: center; transition: 0.3s; z-index: 2; }
+        .avatar { width: 45px; height: 45px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 2px solid var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .seat-name { font-size: 11px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; margin-top: 3px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+        .card { width: 45px; height: 60px; background: #334155; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; margin: 3px; font-weight: bold; border: 2px solid transparent; }
         .card.selected { border-color: var(--primary); background: #312e81; }
+        
         .btn { padding: 8px 16px; border-radius: 6px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: bold; }
         .btn:hover { background: var(--primary-hover); }
         .btn-danger { background: #e11d48; }
-        .task-item { padding: 6px 10px; margin-bottom: 6px; background: #334155; border-radius: 4px; font-size: 13px; }
-        .task-item.active { border-left: 3px solid var(--primary); background: #1e293b; }
+        
+        .task-item { padding: 6px 10px; margin-bottom: 6px; background: #334155; border-radius: 4px; font-size: 13px; cursor: pointer; transition: 0.2s; }
+        .task-item:hover { background: #475569; }
+        .task-item.active { border-left: 4px solid var(--primary); background: #1e293b; }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <strong>Előzmények</strong>
+        <div style="font-size:11px; color:#94a3b8; margin-bottom:8px;">Kattints a szerkesztéshez/váltáshoz</div>
         <div id="history-list" style="margin-top:10px;"></div>
     </div>
     
@@ -33,24 +49,27 @@
         </div>
 
         <div id="game-screen" style="display:none; width:100%; height:100%; flex-direction:column; align-items:center;">
-            <div id="sm-panel" class="controls" style="display:none; text-align:center;">
-                <textarea id="tasks" rows="2" placeholder="Feladatok (soronként adhatod meg)..." style="width:90%; padding:8px; border-radius:6px; resize:none;"></textarea><br>
-                <div style="margin-top:8px; display:flex; justify-content:center; gap:10px;">
-                    <button class="btn" onclick="start()">Feladatok indítása</button>
-                    <button class="btn btn-danger" onclick="resetGame()">Reset</button>
+            <div id="sm-panel" class="controls" style="display:none; margin-bottom: 5px;">
+                <textarea id="tasks" rows="1" placeholder="Feladatok (soronként)..." style="width:85%; padding:6px; border-radius:6px; resize:none;"></textarea>
+                <div style="margin-top:5px; display:flex; justify-content:center; gap:10px;">
+                    <button class="btn" onclick="start()" style="padding:5px 10px; font-size:12px;">Indítás</button>
+                    <button class="btn btn-danger" onclick="resetGame()" style="padding:5px 10px; font-size:12px;">Reset</button>
                 </div>
             </div>
             
-            <div style="text-align:center; margin: auto;">
-                <h3 id="task-title" style="color: #94a3b8; margin-bottom: 5px;">Várakozás a feladatokra...</h3>
-                <div id="avg-display" style="font-size: 4rem; font-weight: bold; color: var(--primary);"></div>
+            <!-- Asztal és Játékosok körben -->
+            <div class="table-area" id="table-area">
+                <div class="table-shape">
+                    <div id="task-title" style="color: #cbd5e1; font-size: 13px; font-weight: bold; padding: 0 10px;">Várakozás...</div>
+                    <div id="avg-display" style="font-size: 2rem; font-weight: bold; color: #818cf8; margin-top: 5px;"></div>
+                </div>
             </div>
 
-            <div style="width:100%; text-align:center;">
-                <div id="cards" style="margin-bottom: 15px;"></div>
+            <div style="width:100%; text-align:center; background: var(--panel); padding: 10px; border-radius: 10px;">
+                <div id="cards" style="margin-bottom: 8px;"></div>
                 <div style="display:flex; justify-content:center; gap:10px;">
                     <button class="btn" onclick="socket.emit('reveal')" style="background:#059669;">Felfedés</button>
-                    <button class="btn" onclick="socket.emit('nextTask')">Következő feladat ➡</button>
+                    <button class="btn" onclick="socket.emit('nextTask')">Következő ➡</button>
                 </div>
             </div>
         </div>
@@ -83,22 +102,47 @@
             if(s.players[socket.id]?.isSM) document.getElementById('sm-panel').style.display = 'block';
             else document.getElementById('sm-panel').style.display = 'none';
 
-            document.getElementById('task-title').innerText = s.tasks[s.currentTaskIndex] ? `Aktuális: ${s.tasks[s.currentTaskIndex]}` : "Nincs aktív feladat";
+            document.getElementById('task-title'].innerText = s.tasks[s.currentTaskIndex] ? s.tasks[s.currentTaskIndex] : "Nincs aktív feladat";
             
-            // Átlag kijelzés felfedés után
+            // Átlag kijelzés
             if(s.revealed && s.taskResults[s.currentTaskIndex]) {
                 const vals = s.taskResults[s.currentTaskIndex].filter(v => v && !isNaN(v));
                 if(vals.length > 0) {
                     const avg = vals.reduce((a,b)=>a+parseInt(b),0)/vals.length;
-                    document.getElementById('avg-display').innerText = `Átlag: ${avg.toFixed(1)}`;
+                    document.getElementById('avg-display').innerText = avg.toFixed(1);
                 } else {
-                    document.getElementById('avg-display').innerText = "Nincs numerikus szavazat";
+                    document.getElementById('avg-display').innerText = "-";
                 }
             } else { 
                 document.getElementById('avg-display').innerText = ""; 
             }
 
-            // Teljes előzmény lista az eddigi eredményekkel
+            // Játékosok kirajzolása az asztal köré
+            const tableArea = document.getElementById('table-area');
+            document.querySelectorAll('.seat').forEach(el => el.remove());
+            
+            const players = Object.values(s.players);
+            players.forEach((p, i) => {
+                const angle = (i / players.length) * 2 * Math.PI - Math.PI / 2; // Fentről indulás
+                const radiusX = 150; // Asztal vízszintes sugara
+                const radiusY = 95;  // Asztal függőleges sugara
+                const x = Math.cos(angle) * radiusX;
+                const y = Math.sin(angle) * radiusY;
+
+                let voteContent = p.vote ? (s.revealed ? p.vote : '✅') : '⏳';
+
+                const seat = document.createElement('div');
+                seat.className = 'seat';
+                seat.style.transform = `translate(${x}px, ${y}px)`;
+                seat.innerHTML = `
+                    <div class="avatar" title="${p.name}">${p.emoji || '👤'}</div>
+                    <div class="seat-name">${p.name}</div>
+                    <div style="font-size:10px; color:#cbd5e1; background:rgba(0,0,0,0.5); padding:1px 4px; border-radius:3px; margin-top:1px;">${voteContent}</div>
+                `;
+                tableArea.appendChild(seat);
+            });
+
+            // Előzmény lista (kattintható)
             const list = document.getElementById('history-list'); 
             list.innerHTML = '';
             s.tasks.forEach((t, i) => {
@@ -107,12 +151,13 @@
                     const vals = s.taskResults[i].filter(v => v && !isNaN(v));
                     if(vals.length > 0) {
                         const avg = (vals.reduce((a,b)=>a+parseInt(b),0)/vals.length).toFixed(1);
-                        resText = ` (Átlag: ${avg})`;
+                        resText = ` (${avg})`;
                     }
                 }
                 const div = document.createElement('div');
                 div.className = `task-item ${i === s.currentTaskIndex ? 'active' : ''}`;
                 div.innerText = `${i+1}. ${t.trim()}${resText}`;
+                div.onclick = () => socket.emit('goToTask', i); // Kattintásra váltás
                 list.appendChild(div);
             });
         });
