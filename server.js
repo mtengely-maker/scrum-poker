@@ -14,7 +14,7 @@ let state = {
     currentTaskIndex: 0, 
     revealed: false, 
     taskResults: {},
-    cardDeckType: 'fibonacci' // Alapértelmezett kártyakészlet
+    cardDeckType: 'fibonacci' 
 };
 
 const emojis = ['🚀', '🦊', '🐼', '🦄', '⚡', '🤖', '🐱', '🦁', '🐯', '🐨'];
@@ -46,15 +46,21 @@ io.on('connection', (socket) => {
     });
 
     socket.on('vote', (vote) => {
-        if(state.players[socket.id]) {
-            state.players[socket.id].vote = vote;
+        const player = state.players[socket.id];
+        // Csak akkor rögzítjük a szavazatot, ha a játékos létezik és NEM Scrum Master
+        if (player && !player.isSM) {
+            player.vote = vote;
             io.emit('state', state);
         }
     });
 
     socket.on('reveal', () => {
         state.revealed = true;
-        state.taskResults[state.currentTaskIndex] = Object.values(state.players).map(p => p.vote);
+        // Csak a nem-SM játékosok szavazatait mentjük el az eredménybe
+        const voterVotes = Object.values(state.players)
+            .filter(p => !p.isSM)
+            .map(p => p.vote);
+        state.taskResults[state.currentTaskIndex] = voterVotes;
         io.emit('state', state);
     });
 
