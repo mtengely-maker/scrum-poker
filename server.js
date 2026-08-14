@@ -13,10 +13,17 @@ let state = {
     tasks: [], 
     currentTaskIndex: 0, 
     revealed: false, 
-    taskResults: {} 
+    taskResults: {},
+    cardDeckType: 'fibonacci' // Alapértelmezett kártyakészlet
 };
 
 const emojis = ['🚀', '🦊', '🐼', '🦄', '⚡', '🤖', '🐱', '🦁', '🐯', '🐨'];
+
+const decks = {
+    fibonacci: ['1', '2', '3', '5', '8', '13', '21', '?', '☕'],
+    extended: ['0', '0.5', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', '☕'],
+    tshirt: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '?', '☕']
+};
 
 io.on('connection', (socket) => {
     socket.on('join', (name) => {
@@ -26,8 +33,11 @@ io.on('connection', (socket) => {
         io.emit('state', state);
     });
 
-    socket.on('addTasks', (tasks) => {
+    socket.on('addTasks', ({ tasks, deckType }) => {
         state.tasks = tasks.filter(t => t.trim() !== "");
+        if (deckType && decks[deckType]) {
+            state.cardDeckType = deckType;
+        }
         state.currentTaskIndex = 0;
         state.taskResults = {};
         state.revealed = false;
@@ -57,18 +67,16 @@ io.on('connection', (socket) => {
         }
     });
 
-    // Új: Visszalépés adott feladatra kattintással
     socket.on('goToTask', (index) => {
         if (index >= 0 && index < state.tasks.length) {
             state.currentTaskIndex = index;
-            // Ha már volt eredménye, felfedett állapotba tehetjük vagy hagyhatjuk
             state.revealed = !!state.taskResults[index];
             io.emit('state', state);
         }
     });
 
     socket.on('resetGame', () => {
-        state = { players: {}, tasks: [], currentTaskIndex: 0, revealed: false, taskResults: {} };
+        state = { players: {}, tasks: [], currentTaskIndex: 0, revealed: false, taskResults: {}, cardDeckType: 'fibonacci' };
         io.emit('state', state);
     });
 
