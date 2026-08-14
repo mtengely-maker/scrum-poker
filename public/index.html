@@ -17,7 +17,9 @@
         .table-shape { width: 300px; height: 160px; background: var(--table); border-radius: 100px; border: 4px solid #047857; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); z-index: 1; }
         
         .seat { position: absolute; display: flex; flex-direction: column; align-items: center; transition: 0.3s; z-index: 2; }
+        .avatar-container { position: relative; }
         .avatar { width: 40px; height: 40px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .sm-badge { position: absolute; top: -5px; right: -5px; font-size: 14px; background: #1e293b; border-radius: 50%; padding: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
         .seat-name { font-size: 10px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; margin-top: 2px; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
         .cards-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; max-width: 600px; }
@@ -55,7 +57,6 @@
         </div>
 
         <div id="game-screen" style="display:none; width:100%; height:100%; flex-direction:column; align-items:center; justify-content:space-between;">
-            <!-- Scrum Master Panel (Feladatok + Skála + Indítás + Reset) -->
             <div id="sm-panel" class="controls" style="display:none; margin-bottom: 5px;">
                 <textarea id="tasks" rows="2" placeholder="Feladatok (soronként)..." style="width:90%; padding:6px; border-radius:6px; resize:none;"></textarea>
                 <div style="margin-top:5px; display:flex; justify-content:center; align-items:center; gap:10px; font-size: 13px;">
@@ -79,10 +80,11 @@
                 </div>
             </div>
 
-            <!-- Kártyák és Vezérlők -->
             <div style="width:100%; text-align:center; background: var(--panel); padding: 10px; border-radius: 10px; margin-top: 10px;">
-                <div id="cards" class="cards-container" style="margin-bottom: 8px;"></div>
-                <!-- Csak a Scrum Master látja a Felfedés és Következő gombokat -->
+                <!-- Ha SM vagyunk, elrejtjük a kártyákat, hiszen ő nem szavaz -->
+                <div id="cards-wrapper">
+                    <div id="cards" class="cards-container" style="margin-bottom: 8px;"></div>
+                </div>
                 <div id="sm-controls" style="display:none; justify-content:center; gap:10px;">
                     <button class="btn" onclick="socket.emit('reveal')" style="background:#059669;">Felfedés</button>
                     <button class="btn" onclick="socket.emit('nextTask')">Következő ➡</button>
@@ -164,9 +166,11 @@
         socket.on('state', (s) => {
             const isSM = s.players[socket.id]?.isSM;
             
-            // Panel megjelenítések SM jog alapján
             document.getElementById('sm-panel').style.display = isSM ? 'block' : 'none';
             document.getElementById('sm-controls').style.display = isSM ? 'flex' : 'none';
+            
+            // Scrum Master elől elrejtjük a szavazókártyákat is
+            document.getElementById('cards-wrapper').style.display = isSM ? 'none' : 'block';
 
             renderCards(s.cardDeckType || 'fibonacci');
             document.getElementById('task-title').innerText = s.tasks[s.currentTaskIndex] ? s.tasks[s.currentTaskIndex] : "Nincs aktív feladat";
@@ -199,13 +203,25 @@
                 const x = Math.cos(angle) * radiusX;
                 const y = Math.sin(angle) * radiusY;
 
-                let voteContent = p.vote ? (s.revealed ? p.vote : '✅') : '⏳';
+                // Ha Scrum Master, akkor nem szavaz, hanem bírói síp jelzést kap (🏴 vagy 🟨) státusz helyett
+                let voteContent = '';
+                if (p.isSM) {
+                    voteContent = '<span style="font-size:11px;">Játékvezető</span>';
+                } else {
+                    voteContent = p.vote ? (s.revealed ? p.vote : '✅') : '⏳';
+                }
+
+                // Bírói síp / jelvény az avatar sarkában az SM-nek
+                const smBadgeHtml = p.isSM ? '<div class="sm-badge" title="Scrum Master">🟨</div>' : '';
 
                 const seat = document.createElement('div');
                 seat.className = 'seat';
                 seat.style.transform = `translate(${x}px, ${y}px)`;
                 seat.innerHTML = `
-                    <div class="avatar" title="${p.name}">${p.emoji || '👤'}</div>
+                    <div class="avatar-container">
+                        <div class="avatar" title="${p.name}">${p.emoji || '👤'}</div>
+                        ${smBadgeHtml}
+                    </div>
                     <div class="seat-name">${p.name}</div>
                     <div style="font-size:10px; color:#cbd5e1; background:rgba(0,0,0,0.6); padding:1px 5px; border-radius:3px; margin-top:2px;">${voteContent}</div>
                 `;
@@ -231,8 +247,6 @@
                 const div = document.createElement('div');
                 div.className = `task-item ${i === s.currentTaskIndex ? 'active' : ''}`;
                 div.innerText = `${i+1}. ${t.trim()}${resText}`;
-                
-                // Ha az előzményre kattintanak, csak az SM tudjon navigálni (vagy bárki, ha úgy tetszik - itt most az SM-re vagy bárkire hagytuk, de az SM irányít)
                 div.onclick = () => {
                     if(isSM) socket.emit('goToTask', i);
                 };
