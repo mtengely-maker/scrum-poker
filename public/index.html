@@ -8,22 +8,21 @@
         :root { --primary: #6366f1; --primary-hover: #4f46e5; --bg: #0f172a; --panel: #1e293b; --table: #065f46; }
         body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; height: 100vh; overflow: hidden; display: flex; }
         
-        .sidebar { width: 240px; background: var(--panel); padding: 15px; border-right: 1px solid #334155; overflow-y: auto; }
-        .container { flex-grow: 1; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; }
+        .sidebar { width: 240px; background: var(--panel); padding: 15px; border-right: 1px solid #334155; overflow-y: auto; flex-shrink: 0; }
+        .container { flex-grow: 1; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; overflow-y: auto; }
         
         .controls { background: var(--panel); padding: 10px; border-radius: 10px; width: 100%; max-width: 500px; text-align: center; }
         
-        /* Asztal stílus */
-        .table-area { flex-grow: 1; position: relative; width: 100%; display: flex; justify-content: center; align-items: center; }
-        .table-shape { width: 320px; height: 180px; background: var(--table); border-radius: 100px; border: 4px solid #047857; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); z-index: 1; }
+        .table-area { flex-grow: 1; position: relative; width: 100%; min-height: 180px; display: flex; justify-content: center; align-items: center; }
+        .table-shape { width: 300px; height: 160px; background: var(--table); border-radius: 100px; border: 4px solid #047857; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); z-index: 1; }
         
-        /* Játékosok az asztal körül */
         .seat { position: absolute; display: flex; flex-direction: column; align-items: center; transition: 0.3s; z-index: 2; }
-        .avatar { width: 45px; height: 45px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; border: 2px solid var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .seat-name { font-size: 11px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; margin-top: 3px; max-width: 80px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .avatar { width: 40px; height: 40px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
+        .seat-name { font-size: 10px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; margin-top: 2px; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 
-        .card { width: 45px; height: 60px; background: #334155; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; margin: 3px; font-weight: bold; border: 2px solid transparent; }
-        .card.selected { border-color: var(--primary); background: #312e81; }
+        .cards-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; max-width: 600px; }
+        .card { width: 42px; height: 58px; background: #334155; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; font-weight: bold; font-size: 14px; border: 2px solid transparent; transition: 0.1s; }
+        .card.selected { border-color: var(--primary); background: #312e81; transform: translateY(-4px); }
         
         .btn { padding: 8px 16px; border-radius: 6px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: bold; }
         .btn:hover { background: var(--primary-hover); }
@@ -32,41 +31,56 @@
         .task-item { padding: 6px 10px; margin-bottom: 6px; background: #334155; border-radius: 4px; font-size: 13px; cursor: pointer; transition: 0.2s; }
         .task-item:hover { background: #475569; }
         .task-item.active { border-left: 4px solid var(--primary); background: #1e293b; }
+
+        /* Mobil reszponzivitás */
+        @media (max-width: 768px) {
+            body { flex-direction: column; height: auto; overflow: auto; }
+            .sidebar { width: 100%; max-height: 150px; border-right: none; border-bottom: 1px solid #334155; }
+            .container { height: auto; }
+            .table-shape { width: 240px; height: 130px; }
+        }
     </style>
 </head>
 <body>
     <div class="sidebar">
         <strong>Előzmények</strong>
-        <div style="font-size:11px; color:#94a3b8; margin-bottom:8px;">Kattints a szerkesztéshez/váltáshoz</div>
-        <div id="history-list" style="margin-top:10px;"></div>
+        <div style="font-size:11px; color:#94a3b8; margin-bottom:8px;">Kattints a váltáshoz</div>
+        <div id="history-list" style="margin-top:5px;"></div>
     </div>
     
     <div class="container">
-        <div id="login-screen" style="margin: auto; text-align: center;">
+        <div id="login-screen" style="margin: auto; text-align: center; padding: 20px;">
             <h2>Csatlakozás</h2>
             <input type="text" id="username" placeholder="Neved..." style="padding:10px; border-radius:6px; border:none; margin-bottom:10px; width:200px;"><br>
             <button class="btn" onclick="join()">Belépés</button>
         </div>
 
-        <div id="game-screen" style="display:none; width:100%; height:100%; flex-direction:column; align-items:center;">
+        <div id="game-screen" style="display:none; width:100%; height:100%; flex-direction:column; align-items:center; justify-content:space-between;">
             <div id="sm-panel" class="controls" style="display:none; margin-bottom: 5px;">
-                <textarea id="tasks" rows="1" placeholder="Feladatok (soronként)..." style="width:85%; padding:6px; border-radius:6px; resize:none;"></textarea>
+                <textarea id="tasks" rows="2" placeholder="Feladatok (soronként)..." style="width:90%; padding:6px; border-radius:6px; resize:none;"></textarea>
+                <div style="margin-top:5px; display:flex; justify-content:center; align-items:center; gap:10px; font-size: 13px;">
+                    <label>Skála:</label>
+                    <select id="deck-select" style="padding:4px; border-radius:4px; background:#334155; color:white; border:none;">
+                        <option value="fibonacci">Fibonacci (1..21)</option>
+                        <option value="extended">Kiterjesztett (0..100)</option>
+                        <option value="tshirt">T-Shirt (XS..XXL)</option>
+                    </select>
+                </div>
                 <div style="margin-top:5px; display:flex; justify-content:center; gap:10px;">
                     <button class="btn" onclick="start()" style="padding:5px 10px; font-size:12px;">Indítás</button>
                     <button class="btn btn-danger" onclick="resetGame()" style="padding:5px 10px; font-size:12px;">Reset</button>
                 </div>
             </div>
             
-            <!-- Asztal és Játékosok körben -->
             <div class="table-area" id="table-area">
                 <div class="table-shape">
                     <div id="task-title" style="color: #cbd5e1; font-size: 13px; font-weight: bold; padding: 0 10px;">Várakozás...</div>
-                    <div id="avg-display" style="font-size: 2rem; font-weight: bold; color: #818cf8; margin-top: 5px;"></div>
+                    <div id="avg-display" style="font-size: 1.8rem; font-weight: bold; color: #818cf8; margin-top: 4px;"></div>
                 </div>
             </div>
 
-            <div style="width:100%; text-align:center; background: var(--panel); padding: 10px; border-radius: 10px;">
-                <div id="cards" style="margin-bottom: 8px;"></div>
+            <div style="width:100%; text-align:center; background: var(--panel); padding: 10px; border-radius: 10px; margin-top: 10px;">
+                <div id="cards" class="cards-container" style="margin-bottom: 8px;"></div>
                 <div style="display:flex; justify-content:center; gap:10px;">
                     <button class="btn" onclick="socket.emit('reveal')" style="background:#059669;">Felfedés</button>
                     <button class="btn" onclick="socket.emit('nextTask')">Következő ➡</button>
@@ -78,6 +92,12 @@
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+        const decks = {
+            fibonacci: ['1', '2', '3', '5', '8', '13', '21', '?', '☕'],
+            extended: ['0', '0.5', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', '☕'],
+            tshirt: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '?', '☕']
+        };
+
         function join() { 
             const name = document.getElementById('username').value.trim();
             if(name) { 
@@ -88,48 +108,74 @@
         }
         function start() { 
             const tasksText = document.getElementById('tasks').value;
-            if(tasksText) socket.emit('addTasks', tasksText.split('\n')); 
+            const deckType = document.getElementById('deck-select').value;
+            if(tasksText) socket.emit('addTasks', { tasks: tasksText.split('\n'), deckType }); 
         }
         function resetGame() { socket.emit('resetGame'); }
         
-        ['1','2','3','5','8','13','21','?'].forEach(v => {
-            const d = document.createElement('div'); d.className='card'; d.innerText=v;
-            d.onclick = () => {
-                document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-                d.classList.add('selected');
-                socket.emit('vote', v);
-            };
-            document.getElementById('cards').appendChild(d);
-        });
+        function renderCards(deckType) {
+            const container = document.getElementById('cards');
+            container.innerHTML = '';
+            const deck = decks[deckType] || decks.fibonacci;
+            deck.forEach(v => {
+                const d = document.createElement('div'); d.className = 'card'; d.innerText = v;
+                d.onclick = () => {
+                    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
+                    d.classList.add('selected');
+                    socket.emit('vote', v);
+                };
+                container.appendChild(d);
+            });
+        }
+
+        // Segédfüggvény a legközelebbi Fibonacci/számérték kiválasztásához
+        function getClosestNumber(num, deckType) {
+            const numericDeck = decks[deckType] ? decks[deckType].map(v => parseFloat(v)).filter(v => !isNaN(v)) : [1,2,3,5,8,13,21];
+            if(numericDeck.length === 0) return num.toFixed(1);
+            let closest = numericDeck[0];
+            let minDiff = Math.abs(num - closest);
+            for(let i = 1; i < numericDeck.length; i++) {
+                let diff = Math.abs(num - numericDeck[i]);
+                if(diff < minDiff) {
+                    minDiff = diff;
+                    closest = numericDeck[i];
+                }
+            }
+            return closest;
+        }
 
         socket.on('state', (s) => {
             if(s.players[socket.id]?.isSM) document.getElementById('sm-panel').style.display = 'block';
             else document.getElementById('sm-panel').style.display = 'none';
 
+            renderCards(s.cardDeckType || 'fibonacci');
+
             document.getElementById('task-title').innerText = s.tasks[s.currentTaskIndex] ? s.tasks[s.currentTaskIndex] : "Nincs aktív feladat";
             
-            // Átlag kijelzés
+            // Okos átlag / kerekítés kijelzés
             if(s.revealed && s.taskResults[s.currentTaskIndex]) {
-                const vals = s.taskResults[s.currentTaskIndex].filter(v => v && !isNaN(v));
+                const rawVotes = s.taskResults[s.currentTaskIndex];
+                const vals = rawVotes.filter(v => v && !isNaN(v)).map(v => parseFloat(v));
                 if(vals.length > 0) {
-                    const avg = vals.reduce((a,b)=>a+parseInt(b),0)/vals.length;
-                    document.getElementById('avg-display').innerText = avg.toFixed(1);
+                    const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+                    const recommended = getClosestNumber(avg, s.cardDeckType);
+                    document.getElementById('avg-display').innerText = `Ajánlott: ${recommended} (Átlag: ${avg.toFixed(1)})`;
                 } else {
-                    document.getElementById('avg-display').innerText = "-";
+                    document.getElementById('avg-display').innerText = "Nem numerikus szavazatok";
                 }
             } else { 
                 document.getElementById('avg-display').innerText = ""; 
             }
 
-            // Játékosok kirajzolása az asztal köré
+            // Játékosok az asztal körül
             const tableArea = document.getElementById('table-area');
             document.querySelectorAll('.seat').forEach(el => el.remove());
             
             const players = Object.values(s.players);
             players.forEach((p, i) => {
                 const angle = (i / players.length) * 2 * Math.PI - Math.PI / 2;
-                const radiusX = 150;
-                const radiusY = 95;
+                const radiusX = 130;
+                const radiusY = 75;
                 const x = Math.cos(angle) * radiusX;
                 const y = Math.sin(angle) * radiusY;
 
@@ -141,7 +187,7 @@
                 seat.innerHTML = `
                     <div class="avatar" title="${p.name}">${p.emoji || '👤'}</div>
                     <div class="seat-name">${p.name}</div>
-                    <div style="font-size:10px; color:#cbd5e1; background:rgba(0,0,0,0.5); padding:1px 4px; border-radius:3px; margin-top:1px;">${voteContent}</div>
+                    <div style="font-size:10px; color:#cbd5e1; background:rgba(0,0,0,0.6); padding:1px 5px; border-radius:3px; margin-top:2px;">${voteContent}</div>
                 `;
                 tableArea.appendChild(seat);
             });
@@ -152,10 +198,11 @@
             s.tasks.forEach((t, i) => {
                 let resText = "";
                 if(s.taskResults[i]) {
-                    const vals = s.taskResults[i].filter(v => v && !isNaN(v));
+                    const vals = s.taskResults[i].filter(v => v && !isNaN(v)).map(v => parseFloat(v));
                     if(vals.length > 0) {
-                        const avg = (vals.reduce((a,b)=>a+parseInt(b),0)/vals.length).toFixed(1);
-                        resText = ` (${avg})`;
+                        const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+                        const rec = getClosestNumber(avg, s.cardDeckType);
+                        resText = ` [${rec}]`;
                     }
                 }
                 const div = document.createElement('div');
