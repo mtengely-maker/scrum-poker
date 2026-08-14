@@ -3,78 +3,84 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scrum Poker</title>
+    <title>Scrum Poker Pro</title>
     <style>
-        body { margin: 0; padding: 10px; background: #0f172a; color: white; font-family: sans-serif; height: 100vh; display: flex; flex-direction: column; }
-        .container { max-width: 600px; margin: 0 auto; width: 100%; display: flex; flex-direction: column; flex-grow: 1; }
-        h1 { font-size: 1.2rem; text-align: center; margin: 5px 0; color: #818cf8; }
-        #game-screen { flex-grow: 1; display: flex; flex-direction: column; overflow: hidden; }
-        .poker-table { flex-grow: 1; background: #065f46; border-radius: 50px; position: relative; margin: 10px 0; min-height: 150px; }
-        .cards-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 5px; margin-top: 10px; }
-        .poker-card { aspect-ratio: 4/5; background: #1e293b; border: 1px solid #334155; border-radius: 5px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 14px; }
-        .poker-card.selected { background: #4f46e5; }
-        input, button { padding: 10px; border-radius: 5px; border: none; margin-top: 5px; width: 100%; }
-        button { background: #4f46e5; color: white; cursor: pointer; }
-        .player-seat { position: absolute; display: flex; flex-direction: column; align-items: center; font-size: 9px; }
+        body { margin: 0; background: #0f172a; color: white; font-family: sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
+        .container { display: flex; flex-direction: column; height: 100%; padding: 10px; max-width: 800px; margin: auto; }
+        
+        /* Asztal körüli ülésrend */
+        .table-area { flex-grow: 1; position: relative; display: flex; justify-content: center; align-items: center; }
+        .table-shape { width: 300px; height: 180px; background: #065f46; border-radius: 100px; border: 4px solid #047857; box-shadow: inset 0 0 50px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; font-weight: bold; }
+        
+        .seat { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 5px; }
+        .avatar { width: 45px; height: 45px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid #64748b; }
+        .seat-name { font-size: 12px; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px; }
+        
+        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); gap: 10px; padding: 10px; }
+        .card { background: #1e293b; border: 2px solid #475569; padding: 15px 5px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; }
+        .card.selected { border-color: #818cf8; background: #312e81; }
+
+        .controls { display: flex; gap: 10px; margin-bottom: 10px; }
+        input, textarea { flex-grow: 1; padding: 8px; border-radius: 5px; border: none; }
+        button { padding: 8px 15px; border-radius: 5px; border: none; background: #4f46e5; color: white; cursor: pointer; }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>⚡ Scrum Poker</h1>
         <div id="login-screen">
-            <input type="text" id="username-input" placeholder="Neved...">
-            <button id="login-btn">Belépés</button>
+            <input type="text" id="username" placeholder="Neved...">
+            <button onclick="join()">Belépés</button>
         </div>
-        <div id="game-screen" style="display:none;">
-            <div id="sm-panel" style="display:none;">
-                <textarea id="tasks-input" rows="1" placeholder="Feladatok (soronként)..."></textarea>
-                <button id="start-btn">Indítás</button>
+        <div id="game-screen" style="display:none; display:flex; flex-direction:column; height:100%;">
+            <div id="sm-panel" style="display:none;" class="controls">
+                <textarea id="tasks" rows="1" placeholder="Feladatok (újsorral)..."></textarea>
+                <button onclick="start()">Indítás</button>
             </div>
-            <div class="poker-table" id="poker-table"></div>
-            <div id="cards-container" class="cards-grid"></div>
-            <div id="actions" style="margin-top:10px;">
-                <button id="reveal-btn" style="background:#059669; display:none;">Felfedés</button>
+            
+            <div class="table-area" id="table">
+                <div class="table-shape" id="task-display">Várakozás...</div>
             </div>
+
+            <div class="cards-grid" id="cards"></div>
+            <button onclick="reveal()" style="margin: 10px auto;">Szavazatok felfedése</button>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        document.getElementById('login-btn').onclick = () => {
-            const name = document.getElementById('username-input').value;
-            if (!name) return;
-            socket.emit('join', name);
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('game-screen').style.display = 'flex';
-        };
-
-        const container = document.getElementById('cards-container');
-        ['1', '2', '3', '5', '8', '13', '21', '?', '☕'].forEach(v => {
-            const d = document.createElement('div');
-            d.className = 'poker-card'; d.innerText = v;
-            d.onclick = () => {
-                document.querySelectorAll('.poker-card').forEach(c => c.classList.remove('selected'));
-                d.classList.add('selected');
-                socket.emit('vote', v);
-            };
-            container.appendChild(d);
+        function join() { const n = document.getElementById('username').value; if(n) { socket.emit('join', n); document.getElementById('login-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; } }
+        
+        // Kártyák kirakása
+        const c = document.getElementById('cards');
+        ['1','2','3','5','8','13','21','?'].forEach(v => {
+            const d = document.createElement('div'); d.className='card'; d.innerText=v;
+            d.onclick = () => { document.querySelectorAll('.card').forEach(x=>x.classList.remove('selected')); d.classList.add('selected'); socket.emit('vote', v); };
+            c.appendChild(d);
         });
 
-        document.getElementById('start-btn').onclick = () => socket.emit('addTasks', document.getElementById('tasks-input').value.split('\n'));
-        document.getElementById('reveal-btn').onclick = () => socket.emit('reveal');
+        function start() { socket.emit('addTasks', document.getElementById('tasks').value.split('\n')); }
+        function reveal() { socket.emit('reveal'); }
 
         socket.on('state', (s) => {
-            if(s.players[socket.id]?.isSM) document.getElementById('sm-panel').style.display = 'block';
-            if(s.tasks.length > 0) document.getElementById('reveal-btn').style.display = 'block';
+            if(s.players[socket.id]?.isSM) document.getElementById('sm-panel').style.display = 'flex';
+            if(s.tasks.length > 0) document.getElementById('task-display').innerText = s.tasks[s.currentTaskIndex];
             
-            const table = document.getElementById('poker-table');
-            table.innerHTML = '';
-            Object.values(s.players).forEach((p, i) => {
-                const seat = document.createElement('div');
-                seat.className = 'player-seat';
-                seat.style.left = `${10 + (i * 20)}%`; seat.style.top = '30%';
-                seat.innerHTML = `<div>${p.vote ? (s.revealed ? p.vote : '✅') : '⏳'}</div><div class="player-name">${p.name}</div>`;
+            const table = document.getElementById('table');
+            const players = Object.values(s.players);
+            
+            // Ülőhelyek törlése (kivéve asztal)
+            document.querySelectorAll('.seat').forEach(x => x.remove());
+            
+            players.forEach((p, i) => {
+                const angle = (i / players.length) * 2 * Math.PI;
+                const x = Math.cos(angle) * 160; 
+                const y = Math.sin(angle) * 100;
+                
+                const seat = document.createElement('div'); seat.className = 'seat';
+                seat.style.transform = `translate(${x}px, ${y}px)`;
+                seat.innerHTML = `<div class="avatar">${p.vote ? (s.revealed ? p.vote : '✔') : '...'}</div><div class="seat-name">${p.name}</div>`;
                 table.appendChild(seat);
             });
         });
