@@ -32,7 +32,6 @@
         .task-item:hover { background: #475569; }
         .task-item.active { border-left: 4px solid var(--primary); background: #1e293b; }
 
-        /* Mobil nézet: csak akkor tördeljük át, ha nagyon kicsi a képernyő */
         @media (max-width: 768px) {
             body { flex-direction: column; height: 100vh; overflow: hidden; }
             .sidebar { width: 100%; height: 130px; border-right: none; border-bottom: 1px solid #334155; flex-shrink: 0; }
@@ -56,6 +55,7 @@
         </div>
 
         <div id="game-screen" style="display:none; width:100%; height:100%; flex-direction:column; align-items:center; justify-content:space-between;">
+            <!-- Scrum Master Panel (Feladatok + Skála + Indítás + Reset) -->
             <div id="sm-panel" class="controls" style="display:none; margin-bottom: 5px;">
                 <textarea id="tasks" rows="2" placeholder="Feladatok (soronként)..." style="width:90%; padding:6px; border-radius:6px; resize:none;"></textarea>
                 <div style="margin-top:5px; display:flex; justify-content:center; align-items:center; gap:10px; font-size: 13px;">
@@ -79,9 +79,11 @@
                 </div>
             </div>
 
+            <!-- Kártyák és Vezérlők -->
             <div style="width:100%; text-align:center; background: var(--panel); padding: 10px; border-radius: 10px; margin-top: 10px;">
                 <div id="cards" class="cards-container" style="margin-bottom: 8px;"></div>
-                <div style="display:flex; justify-content:center; gap:10px;">
+                <!-- Csak a Scrum Master látja a Felfedés és Következő gombokat -->
+                <div id="sm-controls" style="display:none; justify-content:center; gap:10px;">
                     <button class="btn" onclick="socket.emit('reveal')" style="background:#059669;">Felfedés</button>
                     <button class="btn" onclick="socket.emit('nextTask')">Következő ➡</button>
                 </div>
@@ -160,8 +162,11 @@
         }
 
         socket.on('state', (s) => {
-            if(s.players[socket.id]?.isSM) document.getElementById('sm-panel').style.display = 'block';
-            else document.getElementById('sm-panel').style.display = 'none';
+            const isSM = s.players[socket.id]?.isSM;
+            
+            // Panel megjelenítések SM jog alapján
+            document.getElementById('sm-panel').style.display = isSM ? 'block' : 'none';
+            document.getElementById('sm-controls').style.display = isSM ? 'flex' : 'none';
 
             renderCards(s.cardDeckType || 'fibonacci');
             document.getElementById('task-title').innerText = s.tasks[s.currentTaskIndex] ? s.tasks[s.currentTaskIndex] : "Nincs aktív feladat";
@@ -226,7 +231,11 @@
                 const div = document.createElement('div');
                 div.className = `task-item ${i === s.currentTaskIndex ? 'active' : ''}`;
                 div.innerText = `${i+1}. ${t.trim()}${resText}`;
-                div.onclick = () => socket.emit('goToTask', i);
+                
+                // Ha az előzményre kattintanak, csak az SM tudjon navigálni (vagy bárki, ha úgy tetszik - itt most az SM-re vagy bárkire hagytuk, de az SM irányít)
+                div.onclick = () => {
+                    if(isSM) socket.emit('goToTask', i);
+                };
                 list.appendChild(div);
             });
         });
