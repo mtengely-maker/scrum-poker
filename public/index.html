@@ -5,37 +5,41 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scrum Poker Pro</title>
     <style>
-        body { margin: 0; background: #0f172a; color: white; font-family: sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: column; }
-        .container { display: flex; flex-direction: column; height: 100%; padding: 10px; max-width: 800px; margin: auto; }
+        body { margin: 0; background: #0f172a; color: white; font-family: sans-serif; height: 100vh; overflow: hidden; display: flex; }
+        .sidebar { width: 200px; background: #1e293b; padding: 15px; border-right: 1px solid #334155; overflow-y: auto; font-size: 13px; }
+        .container { flex-grow: 1; display: flex; flex-direction: column; padding: 15px; }
         
-        /* Asztal körüli ülésrend */
         .table-area { flex-grow: 1; position: relative; display: flex; justify-content: center; align-items: center; }
-        .table-shape { width: 300px; height: 180px; background: #065f46; border-radius: 100px; border: 4px solid #047857; box-shadow: inset 0 0 50px rgba(0,0,0,0.5); display: flex; align-items: center; justify-content: center; text-align: center; font-size: 14px; font-weight: bold; }
+        .table-shape { width: 320px; height: 180px; background: #065f46; border-radius: 100px; border: 4px solid #047857; display: flex; flex-direction: column; align-items: center; justify-content: center; font-weight: bold; }
         
-        .seat { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 5px; }
-        .avatar { width: 45px; height: 45px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 16px; border: 2px solid #64748b; }
-        .seat-name { font-size: 12px; background: rgba(0,0,0,0.4); padding: 2px 6px; border-radius: 4px; }
+        .seat { position: absolute; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+        .avatar { width: 40px; height: 40px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; border: 2px solid #64748b; }
+        .seat-name { font-size: 11px; background: rgba(0,0,0,0.5); padding: 2px 6px; border-radius: 4px; }
         
-        .cards-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(50px, 1fr)); gap: 10px; padding: 10px; }
-        .card { background: #1e293b; border: 2px solid #475569; padding: 15px 5px; text-align: center; border-radius: 8px; cursor: pointer; font-size: 18px; font-weight: bold; }
+        .cards-grid { display: flex; justify-content: center; gap: 8px; margin-top: 10px; }
+        .card { width: 45px; height: 60px; background: #1e293b; border: 2px solid #475569; border-radius: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; font-weight: bold; }
         .card.selected { border-color: #818cf8; background: #312e81; }
-
-        .controls { display: flex; gap: 10px; margin-bottom: 10px; }
-        input, textarea { flex-grow: 1; padding: 8px; border-radius: 5px; border: none; }
-        button { padding: 8px 15px; border-radius: 5px; border: none; background: #4f46e5; color: white; cursor: pointer; }
+        
+        .task-item { margin-bottom: 5px; padding: 4px; border-radius: 4px; background: #334155; }
+        .task-item.active { border-left: 3px solid #818cf8; }
+        .task-item.done { color: #94a3b8; text-decoration: line-through; }
     </style>
 </head>
 <body>
+    <div class="sidebar" id="sidebar">
+        <strong>Feladatok</strong>
+        <div id="history-list" style="margin-top:10px;"></div>
+    </div>
     <div class="container">
-        <h1>⚡ Scrum Poker</h1>
         <div id="login-screen">
             <input type="text" id="username" placeholder="Neved...">
             <button onclick="join()">Belépés</button>
         </div>
-        <div id="game-screen" style="display:none; display:flex; flex-direction:column; height:100%;">
-            <div id="sm-panel" style="display:none;" class="controls">
+        <div id="game-screen" style="display:none; flex-direction:column; height:100%;">
+            <div id="sm-panel" style="display:none; gap:5px; margin-bottom:10px;">
                 <textarea id="tasks" rows="1" placeholder="Feladatok (újsorral)..."></textarea>
                 <button onclick="start()">Indítás</button>
+                <button onclick="reset()" style="background:#b91c1c;">Reset</button>
             </div>
             
             <div class="table-area" id="table">
@@ -43,43 +47,46 @@
             </div>
 
             <div class="cards-grid" id="cards"></div>
-            <button onclick="reveal()" style="margin: 10px auto;">Szavazatok felfedése</button>
+            <button onclick="reveal()" style="margin: 15px auto; padding: 10px 20px;">Felfedés</button>
         </div>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
-        function join() { const n = document.getElementById('username').value; if(n) { socket.emit('join', n); document.getElementById('login-screen').style.display = 'none'; document.getElementById('game-screen').style.display = 'flex'; } }
+        function join() { const n = document.getElementById('username').value; if(n) { socket.emit('join', n); document.getElementById('login-screen').style.display='none'; document.getElementById('game-screen').style.display='flex'; } }
         
-        // Kártyák kirakása
-        const c = document.getElementById('cards');
         ['1','2','3','5','8','13','21','?'].forEach(v => {
             const d = document.createElement('div'); d.className='card'; d.innerText=v;
             d.onclick = () => { document.querySelectorAll('.card').forEach(x=>x.classList.remove('selected')); d.classList.add('selected'); socket.emit('vote', v); };
-            c.appendChild(d);
+            document.getElementById('cards').appendChild(d);
         });
 
         function start() { socket.emit('addTasks', document.getElementById('tasks').value.split('\n')); }
         function reveal() { socket.emit('reveal'); }
+        function reset() { socket.emit('resetGame'); }
 
         socket.on('state', (s) => {
             if(s.players[socket.id]?.isSM) document.getElementById('sm-panel').style.display = 'flex';
+            
+            // Történet lista
+            const list = document.getElementById('history-list'); list.innerHTML = '';
+            s.tasks.forEach((t, i) => {
+                const div = document.createElement('div');
+                div.className = `task-item ${i === s.currentTaskIndex ? 'active' : ''} ${i < s.currentTaskIndex ? 'done' : ''}`;
+                div.innerText = `${i+1}. ${t}`;
+                list.appendChild(div);
+            });
+
             if(s.tasks.length > 0) document.getElementById('task-display').innerText = s.tasks[s.currentTaskIndex];
             
+            // Ülések
             const table = document.getElementById('table');
-            const players = Object.values(s.players);
-            
-            // Ülőhelyek törlése (kivéve asztal)
             document.querySelectorAll('.seat').forEach(x => x.remove());
-            
-            players.forEach((p, i) => {
-                const angle = (i / players.length) * 2 * Math.PI;
-                const x = Math.cos(angle) * 160; 
-                const y = Math.sin(angle) * 100;
-                
+            Object.values(s.players).forEach((p, i) => {
+                const angle = (i / Object.values(s.players).length) * 2 * Math.PI;
                 const seat = document.createElement('div'); seat.className = 'seat';
-                seat.style.transform = `translate(${x}px, ${y}px)`;
+                seat.style.transform = `translate(${Math.cos(angle)*160}px, ${Math.sin(angle)*100}px)`;
                 seat.innerHTML = `<div class="avatar">${p.vote ? (s.revealed ? p.vote : '✔') : '...'}</div><div class="seat-name">${p.name}</div>`;
                 table.appendChild(seat);
             });
