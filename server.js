@@ -16,10 +16,13 @@ let state = {
     taskResults: {} 
 };
 
+const emojis = ['🚀', '🦊', '🐼', '🦄', '⚡', '🤖', '🐱', '🦁', '🐯', '🐨'];
+
 io.on('connection', (socket) => {
     socket.on('join', (name) => {
         const isSM = Object.keys(state.players).length === 0;
-        state.players[socket.id] = { name, isSM, vote: null };
+        const randomEmoji = emojis[Math.floor(Math.random() * emojis.length)];
+        state.players[socket.id] = { name, isSM, vote: null, emoji: randomEmoji };
         io.emit('state', state);
     });
 
@@ -28,6 +31,7 @@ io.on('connection', (socket) => {
         state.currentTaskIndex = 0;
         state.taskResults = {};
         state.revealed = false;
+        Object.values(state.players).forEach(p => p.vote = null);
         io.emit('state', state);
     });
 
@@ -53,6 +57,16 @@ io.on('connection', (socket) => {
         }
     });
 
+    // Új: Visszalépés adott feladatra kattintással
+    socket.on('goToTask', (index) => {
+        if (index >= 0 && index < state.tasks.length) {
+            state.currentTaskIndex = index;
+            // Ha már volt eredménye, felfedett állapotba tehetjük vagy hagyhatjuk
+            state.revealed = !!state.taskResults[index];
+            io.emit('state', state);
+        }
+    });
+
     socket.on('resetGame', () => {
         state = { players: {}, tasks: [], currentTaskIndex: 0, revealed: false, taskResults: {} };
         io.emit('state', state);
@@ -60,7 +74,6 @@ io.on('connection', (socket) => {
 
     socket.on('disconnect', () => {
         delete state.players[socket.id];
-        // Ha kilépett az SM, adjuk át a jogot másnak
         const remainingPlayers = Object.values(state.players);
         if (remainingPlayers.length > 0 && !remainingPlayers.some(p => p.isSM)) {
             const firstId = Object.keys(state.players)[0];
