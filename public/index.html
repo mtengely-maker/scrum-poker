@@ -6,14 +6,14 @@
     <title>Scrum Poker Pro</title>
     <style>
         :root { --primary: #6366f1; --primary-hover: #4f46e5; --bg: #0f172a; --panel: #1e293b; --table: #065f46; }
-        body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; height: 100vh; overflow: hidden; display: flex; }
+        body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: row; }
         
-        .sidebar { width: 240px; background: var(--panel); padding: 15px; border-right: 1px solid #334155; overflow-y: auto; flex-shrink: 0; }
-        .container { flex-grow: 1; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; overflow-y: auto; }
+        .sidebar { width: 240px; background: var(--panel); padding: 15px; border-right: 1px solid #334155; overflow-y: auto; flex-shrink: 0; height: 100vh; box-sizing: border-box; }
+        .container { flex-grow: 1; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; height: 100vh; box-sizing: border-box; overflow-y: auto; }
         
         .controls { background: var(--panel); padding: 10px; border-radius: 10px; width: 100%; max-width: 500px; text-align: center; }
         
-        .table-area { flex-grow: 1; position: relative; width: 100%; min-height: 180px; display: flex; justify-content: center; align-items: center; }
+        .table-area { flex-grow: 1; position: relative; width: 100%; min-height: 200px; display: flex; justify-content: center; align-items: center; }
         .table-shape { width: 300px; height: 160px; background: var(--table); border-radius: 100px; border: 4px solid #047857; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); z-index: 1; }
         
         .seat { position: absolute; display: flex; flex-direction: column; align-items: center; transition: 0.3s; z-index: 2; }
@@ -32,10 +32,11 @@
         .task-item:hover { background: #475569; }
         .task-item.active { border-left: 4px solid var(--primary); background: #1e293b; }
 
+        /* Mobil nézet: csak akkor tördeljük át, ha nagyon kicsi a képernyő */
         @media (max-width: 768px) {
-            body { flex-direction: column; height: auto; overflow: auto; }
-            .sidebar { width: 100%; max-height: 150px; border-right: none; border-bottom: 1px solid #334155; }
-            .container { height: auto; }
+            body { flex-direction: column; height: 100vh; overflow: hidden; }
+            .sidebar { width: 100%; height: 130px; border-right: none; border-bottom: 1px solid #334155; flex-shrink: 0; }
+            .container { height: calc(100vh - 130px); }
             .table-shape { width: 240px; height: 130px; }
         }
     </style>
@@ -127,14 +128,11 @@
             });
         }
 
-        // Legközelebbi érvényes kártyaérték kiválasztása T-Shirt vagy numerikus alapon
         function getClosestValue(vals, deckType) {
             const deck = decks[deckType] || decks.fibonacci;
             const numericDeck = deck.map(v => parseFloat(v)).filter(v => !isNaN(v));
 
-            // Ha T-Shirt skála van (ahol nincs numerikus érték)
             if (numericDeck.length === 0) {
-                // Egyszerű többségi szavazás T-shirt esetén
                 const counts = {};
                 vals.forEach(v => counts[v] = (counts[v] || 0) + 1);
                 let maxVal = vals[0];
@@ -148,7 +146,6 @@
                 return maxVal;
             }
 
-            // Numerikus skáláknál kiszámoljuk az átlagot, majd megkeressük a legközelebbi skála-elemet
             const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
             let closest = numericDeck[0];
             let minDiff = Math.abs(avg - closest);
@@ -169,18 +166,14 @@
             renderCards(s.cardDeckType || 'fibonacci');
             document.getElementById('task-title').innerText = s.tasks[s.currentTaskIndex] ? s.tasks[s.currentTaskIndex] : "Nincs aktív feladat";
             
-            // Csak a skálához igazított ajánlott érték kijelzése
             if(s.revealed && s.taskResults[s.currentTaskIndex]) {
                 const rawVotes = s.taskResults[s.currentTaskIndex].filter(v => v !== null && v !== undefined);
-                
-                // Ha T-Shirt-nél szöveges szavazatok vannak
                 const numericVals = rawVotes.filter(v => !isNaN(v)).map(v => parseFloat(v));
                 
                 if(numericVals.length > 0) {
                     const recommended = getClosestValue(numericVals, s.cardDeckType);
                     document.getElementById('avg-display').innerText = recommended;
                 } else if(rawVotes.length > 0) {
-                    // Ha text alapú (pl T-Shirt)
                     const recommended = getClosestValue(rawVotes, s.cardDeckType);
                     document.getElementById('avg-display').innerText = recommended;
                 } else {
@@ -190,7 +183,6 @@
                 document.getElementById('avg-display').innerText = ""; 
             }
 
-            // Játékosok az asztal körül
             const tableArea = document.getElementById('table-area');
             document.querySelectorAll('.seat').forEach(el => el.remove());
             
@@ -215,7 +207,6 @@
                 tableArea.appendChild(seat);
             });
 
-            // Előzmény lista a kerekített értékkel
             const list = document.getElementById('history-list'); 
             list.innerHTML = '';
             s.tasks.forEach((t, i) => {
