@@ -115,7 +115,16 @@
             const deckType = document.getElementById('deck-select').value;
             if(tasksText) socket.emit('addTasks', { tasks: tasksText.split('\n'), deckType }); 
         }
-        function resetGame() { socket.emit('resetGame'); }
+        function resetGame() {
+    socket.emit('resetGame');
+
+    document.getElementById('tasks').value = '';
+    document.getElementById('avg-display').innerText = '';
+
+    document
+        .querySelectorAll('.card')
+        .forEach(card => card.classList.remove('selected'));
+}
         
         function renderCards(deckType) {
             const container = document.getElementById('cards');
