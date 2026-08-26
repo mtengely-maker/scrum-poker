@@ -51,10 +51,46 @@
     
     <div class="container">
         <div id="login-screen" style="margin: auto; text-align: center; padding: 20px;">
-            <h2>Csatlakozás</h2>
-            <input type="text" id="username" placeholder="Neved..." style="padding:10px; border-radius:6px; border:none; margin-bottom:10px; width:200px;"><br>
-            <button class="btn" onclick="join()">Belépés</button>
-        </div>
+    <h2>Csatlakozás</h2>
+
+    <div style="margin-bottom: 12px;">
+        <label for="username" style="display:block; font-size:13px; color:#cbd5e1; margin-bottom:5px;">
+            Név
+        </label>
+
+        <input
+            type="text"
+            id="username"
+            placeholder="Neved..."
+            autocomplete="name"
+            style="padding:10px; border-radius:6px; border:none; width:200px; box-sizing:border-box;"
+        >
+    </div>
+
+    <div style="margin-bottom: 12px;">
+        <label for="role-select" style="display:block; font-size:13px; color:#cbd5e1; margin-bottom:5px;">
+            Szerepkör
+        </label>
+
+        <select
+            id="role-select"
+            style="padding:10px; border-radius:6px; border:none; width:200px; box-sizing:border-box; background:#334155; color:white;"
+        >
+            <option value="player" selected>Játékos</option>
+            <option value="facilitator">Játékvezető</option>
+        </select>
+    </div>
+
+    <div
+        id="login-error"
+        style="display:none; max-width:300px; margin:0 auto 12px; padding:8px 10px; border-radius:6px; background:#7f1d1d; color:#fecaca; font-size:12px;"
+    ></div>
+
+    <button id="join-button" class="btn" onclick="join()">
+        Belépés
+    </button>
+</div>
+
 
         <div id="game-screen" style="display:none; width:100%; height:100%; flex-direction:column; align-items:center; justify-content:space-between;">
             <div id="sm-panel" class="controls" style="display:none; margin-bottom: 5px;">
@@ -102,14 +138,55 @@
             tshirt: ['XS', 'S', 'M', 'L', 'XL', 'XXL', '?', '☕']
         };
 
-        function join() { 
-            const name = document.getElementById('username').value.trim();
-            if(name) { 
-                socket.emit('join', name); 
-                document.getElementById('login-screen').style.display = 'none'; 
-                document.getElementById('game-screen').style.display = 'flex'; 
-            } 
-        }
+        function join() {
+    const nameInput = document.getElementById('username');
+    const roleSelect = document.getElementById('role-select');
+    const joinButton = document.getElementById('join-button');
+    const loginError = document.getElementById('login-error');
+
+    const name = nameInput.value.trim();
+    const role = roleSelect.value === 'facilitator'
+        ? 'facilitator'
+        : 'player';
+
+    loginError.style.display = 'none';
+    loginError.innerText = '';
+
+    if (!name) {
+        loginError.innerText = 'Add meg a nevedet!';
+        loginError.style.display = 'block';
+        nameInput.focus();
+        return;
+    }
+
+    joinButton.disabled = true;
+    joinButton.innerText = 'Belépés...';
+
+    socket.emit('join', {
+        name,
+        role
+    });
+}
+
+socket.on('joinSuccess', ({ player }) => {
+    const joinButton = document.getElementById('join-button');
+    const roleSelect = document.getElementById('role-select');
+    const loginError = document.getElementById('login-error');
+
+    joinButton.disabled = false;
+    joinButton.innerText = 'Belépés';
+
+    loginError.style.display = 'none';
+    loginError.innerText = '';
+
+    localStorage.setItem(
+        'scrumPokerLastRole',
+        player.role || roleSelect.value || 'player'
+    );
+
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'flex';
+});
         function start() { 
             const tasksText = document.getElementById('tasks').value;
             const deckType = document.getElementById('deck-select').value;
@@ -125,6 +202,27 @@
         .querySelectorAll('.card')
         .forEach(card => card.classList.remove('selected'));
 }
+
+socket.on('joinError', ({ message }) => {
+    const joinButton = document.getElementById('join-button');
+    const loginError = document.getElementById('login-error');
+
+    joinButton.disabled = false;
+    joinButton.innerText = 'Belépés';
+
+    loginError.innerText =
+        message || 'A belépés nem sikerült.';
+
+    loginError.style.display = 'block';
+});
+
+socket.on('actionError', ({ message }) => {
+    alert(message || 'A művelet nem hajtható végre.');
+});
+
+socket.on('roleChangeError', ({ message }) => {
+    alert(message || 'A szerepkör módosítása nem sikerült.');
+});
         
         function renderCards(deckType) {
             const container = document.getElementById('cards');
@@ -262,6 +360,29 @@
                 list.appendChild(div);
             });
         });
+      
+        document.addEventListener('DOMContentLoaded', () => {
+    const savedRole =
+        localStorage.getItem('scrumPokerLastRole');
+
+    const roleSelect =
+        document.getElementById('role-select');
+
+    if (
+        savedRole === 'player' ||
+        savedRole === 'facilitator'
+    ) {
+        roleSelect.value = savedRole;
+    }
+
+    document
+        .getElementById('username')
+        .addEventListener('keydown', event => {
+            if (event.key === 'Enter') {
+                join();
+            }
+        });
+});
     </script>
 </body>
 </html>
