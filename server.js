@@ -82,9 +82,17 @@ io.on('connection', (socket) => {
     });
 
     socket.on('resetGame', () => {
-        state = { players: {}, tasks: [], currentTaskIndex: 0, revealed: false, taskResults: {}, cardDeckType: 'fibonacci' };
-        io.emit('state', state);
+    state.tasks = [];
+    state.currentTaskIndex = 0;
+    state.revealed = false;
+    state.taskResults = {};
+
+    Object.values(state.players).forEach(player => {
+        player.vote = null;
     });
+
+    io.emit('state', state);
+});
 
     socket.on('disconnect', () => {
         delete state.players[socket.id];
