@@ -526,29 +526,70 @@ transform-origin: center bottom;
             .cards-container {
     flex-wrap: nowrap;
     justify-content: flex-start;
+    align-items: flex-end;
+    gap: 8px;
+
+    width: 100%;
     max-width: none;
+    min-height: 96px;
+
     overflow-x: auto;
-    overflow-y: visible;
-    padding: 14px 10px 8px;
+    overflow-y: hidden;
+
+    padding: 12px 18px 10px;
+    scroll-padding-left: 18px;
+    scroll-padding-right: 18px;
     scroll-behavior: smooth;
+    overscroll-behavior-x: contain;
+    box-sizing: border-box;
+
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: thin;
 }
 
 .cards-container .card + .card {
     margin-left: 0;
 }
 
+.cards-container::-webkit-scrollbar {
+    height: 5px;
+}
+
+.cards-container::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.35);
+    border-radius: 999px;
+}
+
+.cards-container::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.45);
+    border-radius: 999px;
+}
+
+.cards-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(165, 180, 252, 0.7);
+}
+
 .card {
-    width: 54px;
-    height: 78px;
+    width: 56px;
+    height: 80px;
+    min-width: 56px;
+    min-height: 80px;
     font-size: 21px;
+
+    transform: translateY(0) rotate(0deg);
+    transform-origin: center bottom;
+
+    touch-action: manipulation;
+    -webkit-tap-highlight-color: transparent;
 }
 
 .card:hover {
-    transform: translateY(-5px);
+    transform: translateY(0) rotate(0deg);
 }
 
 .card.selected {
-    transform: translateY(-8px) scale(1.04);
+    transform: translateY(-7px) rotate(0deg) scale(1.05);
+    z-index: 20;
 }
         }
     </style>
@@ -781,6 +822,7 @@ container.classList.add(`deck-${activeDeckType}`);
 
     const cardCount = deck.length;
     const centerIndex = (cardCount - 1) / 2;
+let selectedCardElement = null;
 
     let maximumRotation;
     let maximumOffset;
@@ -830,6 +872,10 @@ container.classList.add(`deck-${activeDeckType}`);
 
 card.className =
     `card ${cardStyleClass}${isSelected ? ' selected' : ''}`;
+
+    if (isSelected) {
+    selectedCardElement = card;
+}
         card.innerText = value;
         card.dataset.value = value;
         card.title = `${value} becslés`;
@@ -852,11 +898,32 @@ card.className =
                 });
 
             card.classList.add('selected');
-            socket.emit('vote', value);
+
+if (window.matchMedia('(max-width: 768px)').matches) {
+    card.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center'
+    });
+}
+
+socket.emit('vote', value);
         };
 
         container.appendChild(card);
     });
+    if (
+    selectedCardElement &&
+    window.matchMedia('(max-width: 768px)').matches
+) {
+    requestAnimationFrame(() => {
+        selectedCardElement.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+            inline: 'center'
+        });
+    });
+}
 }
 
         function getClosestValue(vals, deckType) {
@@ -899,7 +966,7 @@ card.className =
 
             // Scrum Master elől elrejtjük a szavazókártyákat is
             document.getElementById('cards-wrapper').style.display = isSM ? 'none' : 'block';
-
+            
             renderCards(
     s.cardDeckType || 'fibonacci',
     selectedVote
