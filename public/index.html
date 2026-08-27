@@ -149,13 +149,185 @@
         }
 
         .controls {
-            background: var(--panel);
-            padding: 10px;
-            border-radius: 10px;
-            width: 100%;
-            max-width: 500px;
-            text-align: center;
-        }
+    width: min(100%, 680px);
+    padding: 12px 14px;
+    box-sizing: border-box;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(30, 41, 59, 0.98) 0%,
+            rgba(15, 23, 42, 0.98) 100%
+        );
+
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 16px;
+
+    text-align: left;
+
+    box-shadow:
+        0 12px 26px rgba(0, 0, 0, 0.27),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.facilitator-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+
+    margin-bottom: 9px;
+}
+
+.facilitator-panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    color: #f8fafc;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+}
+
+.facilitator-panel-title-icon {
+    width: 25px;
+    height: 25px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(245, 158, 11, 0.13);
+    border: 1px solid rgba(245, 158, 11, 0.28);
+    border-radius: 8px;
+
+    color: #fbbf24;
+    font-size: 13px;
+}
+
+.facilitator-panel-hint {
+    color: #64748b;
+    font-size: 9px;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.facilitator-panel-body {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.task-input-group {
+    min-width: 0;
+}
+
+.task-input-label {
+    display: block;
+    margin-bottom: 5px;
+
+    color: #94a3b8;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.task-input {
+    width: 100%;
+    min-height: 66px;
+    max-height: 110px;
+
+    padding: 9px 11px;
+    box-sizing: border-box;
+    resize: vertical;
+
+    background: rgba(2, 6, 23, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 10px;
+
+    color: #f8fafc;
+    font-family: inherit;
+    font-size: 11px;
+    line-height: 1.4;
+
+    outline: none;
+
+    transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease,
+        background 160ms ease;
+}
+
+.task-input::placeholder {
+    color: #64748b;
+}
+
+.task-input:focus {
+    background: rgba(2, 6, 23, 0.9);
+    border-color: rgba(129, 140, 248, 0.72);
+
+    box-shadow:
+        0 0 0 3px rgba(99, 102, 241, 0.13),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.facilitator-settings {
+    width: 180px;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 9px;
+}
+
+.deck-field {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.deck-field-label {
+    color: #94a3b8;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.deck-select {
+    width: 100%;
+    padding: 8px 9px;
+    box-sizing: border-box;
+
+    background: rgba(2, 6, 23, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 9px;
+
+    color: #f8fafc;
+    font-size: 10px;
+    font-weight: 700;
+
+    outline: none;
+    cursor: pointer;
+
+    transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.deck-select:focus {
+    border-color: rgba(129, 140, 248, 0.72);
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.13);
+}
+
+.facilitator-actions {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 7px;
+}
 
         .table-area {
     flex-grow: 1;
@@ -546,22 +718,85 @@ transform-origin: center bottom;
 }
 
         .btn {
-            padding: 8px 16px;
-            border-radius: 6px;
-            border: none;
-            background: var(--primary);
-            color: white;
-            cursor: pointer;
-            font-weight: bold;
-        }
+    min-height: 34px;
+    padding: 8px 14px;
+    box-sizing: border-box;
 
-        .btn:hover {
-            background: var(--primary-hover);
-        }
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
 
-        .btn-danger {
-            background: #e11d48;
-        }
+    background:
+        linear-gradient(
+            145deg,
+            #6366f1 0%,
+            #4f46e5 100%
+        );
+
+    border: 1px solid rgba(165, 180, 252, 0.32);
+    border-radius: 9px;
+
+    color: #ffffff;
+    font-family: inherit;
+    font-size: 10px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 6px 12px rgba(49, 46, 129, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+    transition:
+        transform 140ms ease,
+        background 140ms ease,
+        box-shadow 140ms ease,
+        filter 140ms ease;
+}
+
+.btn:hover {
+    background:
+        linear-gradient(
+            145deg,
+            #4f46e5 0%,
+            #4338ca 100%
+        );
+
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 8px 16px rgba(49, 46, 129, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.16);
+}
+
+.btn:active {
+    transform: translateY(0);
+}
+
+.btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.btn-danger {
+    background: rgba(127, 29, 29, 0.72);
+    border-color: rgba(251, 113, 133, 0.25);
+    color: #fecdd3;
+
+    box-shadow:
+        0 5px 10px rgba(76, 5, 25, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.btn-danger:hover {
+    background: rgba(159, 18, 57, 0.88);
+
+    box-shadow:
+        0 7px 14px rgba(76, 5, 25, 0.32),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
 
         .task-item {
             padding: 6px 10px;
@@ -792,6 +1027,62 @@ transform-origin: center bottom;
                 margin-top: 0;
             }
 
+            .controls {
+    width: 100%;
+    padding: 9px 10px;
+    border-radius: 12px;
+}
+
+.facilitator-panel-header {
+    margin-bottom: 7px;
+}
+
+.facilitator-panel-title {
+    font-size: 10px;
+}
+
+.facilitator-panel-title-icon {
+    width: 21px;
+    height: 21px;
+    font-size: 10px;
+}
+
+.facilitator-panel-hint {
+    display: none;
+}
+
+.facilitator-panel-body {
+    grid-template-columns: minmax(0, 1fr) 132px;
+    gap: 7px;
+}
+
+.task-input {
+    min-height: 58px;
+    max-height: 76px;
+    padding: 7px 8px;
+    font-size: 10px;
+}
+
+.facilitator-settings {
+    width: 132px;
+    gap: 6px;
+}
+
+.deck-select {
+    padding: 6px 7px;
+    font-size: 9px;
+}
+
+.facilitator-actions {
+    gap: 5px;
+}
+
+.facilitator-actions .btn {
+    min-height: 30px;
+    padding: 6px 8px;
+    font-size: 9px;
+}
+
             .table-shape {
     width: 240px;
     height: 130px;
@@ -926,6 +1217,32 @@ transform-origin: center bottom;
     z-index: 20;
 }
         }
+        @media (max-width: 460px) {
+    .facilitator-panel-body {
+        grid-template-columns: 1fr;
+    }
+
+    .facilitator-settings {
+        width: 100%;
+        flex-direction: row;
+        align-items: end;
+    }
+
+    .deck-field {
+        flex: 1;
+    }
+
+    .facilitator-actions {
+        width: auto;
+        flex-shrink: 0;
+    }
+
+    .task-input {
+        min-height: 52px;
+        max-height: 64px;
+        resize: none;
+    }
+}
     </style>
 </head>
 
@@ -991,24 +1308,75 @@ transform-origin: center bottom;
 
         <div id="game-screen"
             style="display:none; width:100%; height:100%; flex-direction:column; align-items:center; justify-content:space-between;">
-            <div id="sm-panel" class="controls" style="display:none; margin-bottom: 5px;">
-                <textarea id="tasks" rows="2" placeholder="Feladatok (soronként)..."
-                    style="width:90%; padding:6px; border-radius:6px; resize:none;"></textarea>
-                <div
-                    style="margin-top:5px; display:flex; justify-content:center; align-items:center; gap:10px; font-size: 13px;">
-                    <label>Skála:</label>
-                    <select id="deck-select"
-                        style="padding:4px; border-radius:4px; background:#334155; color:white; border:none;">
-                        <option value="fibonacci">Fibonacci (1..21)</option>
-                        <option value="extended">Kiterjesztett (0..100)</option>
-                        <option value="tshirt">T-Shirt (XS..XXL)</option>
-                    </select>
-                </div>
-                <div style="margin-top:5px; display:flex; justify-content:center; gap:10px;">
-                    <button class="btn" onclick="start()" style="padding:5px 10px; font-size:12px;">Indítás</button>
-                    <button class="btn btn-danger" onclick="resetGame()"
-                        style="padding:5px 10px; font-size:12px;">Reset</button>
-                </div>
+            <div id="sm-panel" class="controls" style="display:none;">
+    <div class="facilitator-panel-header">
+        <div class="facilitator-panel-title">
+            <span class="facilitator-panel-title-icon">★</span>
+            <span>Játékvezetői panel</span>
+        </div>
+
+        <div class="facilitator-panel-hint">
+            Egy feladat soronként
+        </div>
+    </div>
+
+    <div class="facilitator-panel-body">
+        <div class="task-input-group">
+            <label class="task-input-label" for="tasks">
+                Becslendő feladatok
+            </label>
+
+            <textarea
+                id="tasks"
+                class="task-input"
+                rows="2"
+                placeholder="Például:&#10;Bejelentkezési folyamat fejlesztése&#10;Riport export kialakítása"
+            ></textarea>
+        </div>
+
+        <div class="facilitator-settings">
+            <div class="deck-field">
+                <label class="deck-field-label" for="deck-select">
+                    Becslési skála
+                </label>
+
+                <select id="deck-select" class="deck-select">
+                    <option value="fibonacci">
+                        Fibonacci
+                    </option>
+
+                    <option value="extended">
+                        Kiterjesztett
+                    </option>
+
+                    <option value="tshirt">
+                        T-Shirt
+                    </option>
+                </select>
+            </div>
+
+            <div class="facilitator-actions">
+                <button
+                    class="btn"
+                    onclick="start()"
+                    title="Új becslés indítása"
+                >
+                    <span aria-hidden="true">▶</span>
+                    <span>Indítás</span>
+                </button>
+
+                <button
+                    class="btn btn-danger"
+                    onclick="resetGame()"
+                    title="Aktuális játék törlése"
+                >
+                    <span aria-hidden="true">↻</span>
+                    <span>Reset</span>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
             </div>
 
             <div class="table-area" id="table-area">
