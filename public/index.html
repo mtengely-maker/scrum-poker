@@ -432,6 +432,25 @@ transform-origin: center bottom;
             background: #1e293b;
         }
 
+        @media (min-width: 769px) and (max-width: 1180px) {
+    .cards-container.deck-extended {
+        gap: 2px;
+        max-width: 100%;
+        padding-left: 22px;
+        padding-right: 22px;
+    }
+
+    .cards-container.deck-extended .card {
+        width: 48px;
+        height: 72px;
+        font-size: 20px;
+    }
+
+    .cards-container.deck-extended .card::before,
+    .cards-container.deck-extended .card::after {
+        font-size: 8px;
+    }
+}
         @media (max-width: 768px) {
             body {
                 flex-direction: column;
@@ -711,6 +730,18 @@ transform-origin: center bottom;
         function renderCards(deckType) {
     const container = document.getElementById('cards');
     container.innerHTML = '';
+
+    container.classList.remove(
+    'deck-fibonacci',
+    'deck-extended',
+    'deck-tshirt'
+);
+
+const activeDeckType = decks[deckType]
+    ? deckType
+    : 'fibonacci';
+
+container.classList.add(`deck-${activeDeckType}`);
 
     const deck = decks[deckType] || decks.fibonacci;
 
