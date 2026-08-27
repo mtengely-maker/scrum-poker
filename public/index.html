@@ -432,6 +432,29 @@ transform-origin: center bottom;
             background: #1e293b;
         }
 
+@media (min-width: 769px) {
+    .cards-container {
+        gap: 0;
+        padding-left: 18px;
+        padding-right: 18px;
+    }
+
+    .cards-container .card + .card {
+        margin-left: -5px;
+    }
+
+    .cards-container.deck-fibonacci .card + .card {
+        margin-left: -4px;
+    }
+
+    .cards-container.deck-extended .card + .card {
+        margin-left: -8px;
+    }
+
+    .cards-container.deck-tshirt .card + .card {
+        margin-left: -3px;
+    }
+}
         @media (min-width: 769px) and (max-width: 1180px) {
     .cards-container.deck-extended {
         gap: 2px;
@@ -508,6 +531,10 @@ transform-origin: center bottom;
     overflow-y: visible;
     padding: 14px 10px 8px;
     scroll-behavior: smooth;
+}
+
+.cards-container .card + .card {
+    margin-left: 0;
 }
 
 .card {
