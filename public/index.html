@@ -58,18 +58,83 @@
             font-size: 11px;
             letter-spacing: 0.04em;
         }
+.app-status {
+    display: flex;
+    align-items: center;
+    gap: 7px;
 
-        .app-header-badge {
-            padding: 6px 10px;
-            border: 1px solid rgba(99, 102, 241, 0.4);
-            border-radius: 999px;
-            background: rgba(99, 102, 241, 0.1);
-            color: #a5b4fc;
-            font-size: 11px;
-            font-weight: 700;
-            white-space: nowrap;
-        }
+    padding: 6px;
 
+    background: rgba(15, 23, 42, 0.74);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 13px;
+
+    box-shadow:
+        0 7px 16px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.status-item {
+    min-height: 29px;
+    padding: 0 10px;
+
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    box-sizing: border-box;
+
+    background: rgba(30, 41, 59, 0.62);
+    border: 1px solid rgba(148, 163, 184, 0.13);
+    border-radius: 9px;
+
+    color: #cbd5e1;
+    font-size: 9px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-icon {
+    color: #818cf8;
+    font-size: 11px;
+}
+
+.connection-indicator {
+    width: 7px;
+    height: 7px;
+
+    background: #f59e0b;
+    border-radius: 50%;
+
+    box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.12);
+
+    transition:
+        background 180ms ease,
+        box-shadow 180ms ease;
+}
+
+.connection-indicator.connected {
+    background: #34d399;
+    box-shadow:
+        0 0 0 3px rgba(52, 211, 153, 0.13),
+        0 0 8px rgba(52, 211, 153, 0.5);
+}
+
+.connection-indicator.disconnected {
+    background: #fb7185;
+    box-shadow:
+        0 0 0 3px rgba(251, 113, 133, 0.13),
+        0 0 8px rgba(251, 113, 133, 0.32);
+}
+
+.status-value {
+    color: #f8fafc;
+    font-weight: 800;
+}
+
+.status-label {
+    color: #94a3b8;
+}
         .brand-logo {
             position: relative;
             width: 54px;
@@ -113,15 +178,41 @@
         }
 
         body {
-            margin: 0;
-            background: var(--bg);
-            color: white;
-            font-family: sans-serif;
-            height: 100vh;
-            overflow: hidden;
-            display: flex;
-            flex-direction: row;
-        }
+    margin: 0;
+    height: 100vh;
+    overflow: hidden;
+
+    display: flex;
+    flex-direction: row;
+
+    background:
+        radial-gradient(
+            circle at 75% 20%,
+            rgba(99, 102, 241, 0.11) 0%,
+            transparent 34%
+        ),
+        radial-gradient(
+            circle at 28% 82%,
+            rgba(4, 120, 87, 0.09) 0%,
+            transparent 32%
+        ),
+        linear-gradient(
+            145deg,
+            #0f172a 0%,
+            #0b1120 52%,
+            #070d19 100%
+        );
+
+    color: #f8fafc;
+    font-family:
+        Inter,
+        "Segoe UI",
+        Arial,
+        sans-serif;
+
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
 
         .sidebar {
     width: 260px;
@@ -285,7 +376,170 @@
             box-sizing: border-box;
             overflow-y: auto;
         }
+.login-screen {
+    width: min(100%, 390px);
+    margin: auto;
+    padding: 28px;
 
+    box-sizing: border-box;
+
+    background:
+        radial-gradient(
+            circle at 80% 10%,
+            rgba(99, 102, 241, 0.13) 0%,
+            transparent 35%
+        ),
+        linear-gradient(
+            145deg,
+            rgba(30, 41, 59, 0.97) 0%,
+            rgba(15, 23, 42, 0.98) 100%
+        );
+
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 22px;
+
+    text-align: left;
+
+    box-shadow:
+        0 26px 60px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.login-icon {
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(99, 102, 241, 0.24) 0%,
+            rgba(67, 56, 202, 0.14) 100%
+        );
+
+    border: 1px solid rgba(165, 180, 252, 0.3);
+    border-radius: 15px;
+
+    color: #c7d2fe;
+    font-size: 23px;
+
+    box-shadow:
+        0 9px 18px rgba(30, 27, 75, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.login-title {
+    margin: 0;
+
+    color: #f8fafc;
+    font-size: 22px;
+    font-weight: 850;
+    letter-spacing: -0.025em;
+}
+
+.login-description {
+    margin: 7px 0 20px;
+
+    color: #94a3b8;
+    font-size: 11px;
+    line-height: 1.5;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+}
+
+.login-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.login-label {
+    color: #94a3b8;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+}
+
+.login-input,
+.login-select {
+    width: 100%;
+    min-height: 42px;
+    padding: 10px 12px;
+
+    box-sizing: border-box;
+
+    background: rgba(2, 6, 23, 0.7);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 10px;
+
+    color: #f8fafc;
+    font-family: inherit;
+    font-size: 12px;
+
+    outline: none;
+
+    transition:
+        border-color 160ms ease,
+        box-shadow 160ms ease,
+        background 160ms ease;
+}
+
+.login-input::placeholder {
+    color: #64748b;
+}
+
+.login-input:focus,
+.login-select:focus {
+    background: rgba(2, 6, 23, 0.9);
+    border-color: rgba(129, 140, 248, 0.72);
+
+    box-shadow:
+        0 0 0 3px rgba(99, 102, 241, 0.13),
+        inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.login-select {
+    cursor: pointer;
+}
+
+.login-error {
+    display: none;
+    padding: 9px 11px;
+
+    background: rgba(127, 29, 29, 0.55);
+    border: 1px solid rgba(251, 113, 133, 0.28);
+    border-radius: 9px;
+
+    color: #fecaca;
+    font-size: 10px;
+    font-weight: 650;
+    line-height: 1.4;
+}
+
+.login-submit {
+    width: 100%;
+    min-height: 42px;
+    margin-top: 3px;
+    font-size: 11px;
+}
+
+.login-note {
+    margin: 14px 0 0;
+
+    color: #64748b;
+    font-size: 9px;
+    line-height: 1.45;
+    text-align: center;
+}
         .controls {
     width: min(100%, 680px);
     padding: 12px 14px;
@@ -1257,9 +1511,24 @@ transform-origin: center bottom;
                 display: none;
             }
 
-            .app-header-badge {
-                display: none;
-            }
+            .app-status {
+    gap: 4px;
+    padding: 4px;
+}
+
+.status-item {
+    min-height: 26px;
+    padding: 0 7px;
+    font-size: 8px;
+}
+
+.app-status .status-item:nth-child(3) {
+    display: none;
+}
+
+.status-label {
+    display: none;
+}
 
             .brand-logo {
                 width: 48px;
@@ -1550,7 +1819,47 @@ transform-origin: center bottom;
 }
         }
         @media (max-width: 460px) {
-    .facilitator-panel-body {
+    .app-header {
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.app-title {
+    max-width: 165px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.app-status .status-item:nth-child(2) {
+    display: none;
+}
+
+.connection-indicator {
+    width: 6px;
+    height: 6px;
+}
+
+.login-screen {
+    width: 100%;
+    padding: 21px 18px;
+    border-radius: 17px;
+}
+
+.login-icon {
+    width: 42px;
+    height: 42px;
+    margin-bottom: 13px;
+    font-size: 20px;
+}
+
+.login-title {
+    font-size: 19px;
+}
+
+.login-description {
+    margin-bottom: 16px;
+}
+            .facilitator-panel-body {
         grid-template-columns: 1fr;
     }
 
@@ -1593,9 +1902,39 @@ transform-origin: center bottom;
             </div>
         </div>
 
-        <div class="app-header-badge">
-            Planning Poker
-        </div>
+        <div class="app-status" aria-label="Játék állapota">
+    <div class="status-item" title="Kapcsolati állapot">
+        <span
+            id="connection-indicator"
+            class="connection-indicator"
+            aria-hidden="true"
+        ></span>
+
+        <span id="connection-status" class="status-value">
+            Kapcsolódás...
+        </span>
+    </div>
+
+    <div class="status-item" title="Belépett játékosok száma">
+        <span class="status-icon" aria-hidden="true">♟</span>
+
+        <span id="player-count" class="status-value">
+            0
+        </span>
+
+        <span id="player-count-label" class="status-label">
+    játékos
+</span>
+    </div>
+
+    <div class="status-item" title="Aktív becslési skála">
+        <span class="status-icon" aria-hidden="true">◇</span>
+
+        <span id="active-deck-name" class="status-value">
+            Fibonacci
+        </span>
+    </div>
+</div>
     </header>
     <aside class="sidebar">
     <div class="history-header">
@@ -1626,38 +1965,67 @@ transform-origin: center bottom;
 </aside>
 
     <div class="container">
-        <div id="login-screen" style="margin: auto; text-align: center; padding: 20px;">
-            <h2>Csatlakozás</h2>
+        <div id="login-screen" class="login-screen">
+    <div class="login-icon" aria-hidden="true">
+        ♠
+    </div>
 
-            <div style="margin-bottom: 12px;">
-                <label for="username" style="display:block; font-size:13px; color:#cbd5e1; margin-bottom:5px;">
-                    Név
-                </label>
+    <h2 class="login-title">
+        Csatlakozás a játékhoz
+    </h2>
 
-                <input type="text" id="username" placeholder="Neved..." autocomplete="name"
-                    style="padding:10px; border-radius:6px; border:none; width:200px; box-sizing:border-box;">
-            </div>
+    <p class="login-description">
+        Add meg a neved és válaszd ki a szerepköröd.
+        Ezután azonnal csatlakozhatsz a becsléshez.
+    </p>
 
-            <div style="margin-bottom: 12px;">
-                <label for="role-select" style="display:block; font-size:13px; color:#cbd5e1; margin-bottom:5px;">
-                    Szerepkör
-                </label>
+    <div class="login-form">
+        <div class="login-field">
+            <label class="login-label" for="username">
+                Név
+            </label>
 
-                <select id="role-select"
-                    style="padding:10px; border-radius:6px; border:none; width:200px; box-sizing:border-box; background:#334155; color:white;">
-                    <option value="player" selected>Játékos</option>
-                    <option value="facilitator">Játékvezető</option>
-                </select>
-            </div>
-
-            <div id="login-error"
-                style="display:none; max-width:300px; margin:0 auto 12px; padding:8px 10px; border-radius:6px; background:#7f1d1d; color:#fecaca; font-size:12px;">
-            </div>
-
-            <button id="join-button" class="btn" onclick="join()">
-                Belépés
-            </button>
+            <input
+                type="text"
+                id="username"
+                class="login-input"
+                placeholder="Írd be a neved..."
+                autocomplete="name"
+            >
         </div>
+
+        <div class="login-field">
+            <label class="login-label" for="role-select">
+                Szerepkör
+            </label>
+
+            <select id="role-select" class="login-select">
+                <option value="player" selected>
+                    Játékos
+                </option>
+
+                <option value="facilitator">
+                    Játékvezető
+                </option>
+            </select>
+        </div>
+
+        <div id="login-error" class="login-error"></div>
+
+        <button
+            id="join-button"
+            class="btn login-submit"
+            onclick="join()"
+        >
+            <span aria-hidden="true">→</span>
+            <span>Belépés</span>
+        </button>
+    </div>
+
+    <p class="login-note">
+        A játékosok szavaznak, a játékvezető kezeli a feladatokat és az eredmények felfedését.
+    </p>
+</div>
 
 
         <div id="game-screen"
@@ -1760,6 +2128,39 @@ transform-origin: center bottom;
     <script src="/socket.io/socket.io.js"></script>
     <script>
         const socket = io();
+        const connectionIndicator =
+    document.getElementById('connection-indicator');
+
+const connectionStatus =
+    document.getElementById('connection-status');
+
+function updateConnectionStatus(isConnected) {
+    connectionIndicator.classList.toggle(
+        'connected',
+        isConnected
+    );
+
+    connectionIndicator.classList.toggle(
+        'disconnected',
+        !isConnected
+    );
+
+    connectionStatus.innerText = isConnected
+        ? 'Kapcsolódva'
+        : 'Nincs kapcsolat';
+}
+
+socket.on('connect', () => {
+    updateConnectionStatus(true);
+});
+
+socket.on('disconnect', () => {
+    updateConnectionStatus(false);
+});
+
+socket.on('connect_error', () => {
+    updateConnectionStatus(false);
+});
         const decks = {
             fibonacci: ['1', '2', '3', '5', '8', '13', '21', '?', '☕'],
             extended: ['0', '0.5', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', '☕'],
@@ -2017,7 +2418,23 @@ socket.emit('vote', value);
         socket.on('state', (s) => {
             const isSM = s.players[socket.id]?.isSM;
             const selectedVote = s.players[socket.id]?.vote ?? null;
+const playerCountElement =
+    document.getElementById('player-count');
 
+const activeDeckNameElement =
+    document.getElementById('active-deck-name');
+
+const deckNames = {
+    fibonacci: 'Fibonacci',
+    extended: 'Kiterjesztett',
+    tshirt: 'T-Shirt'
+};
+
+playerCountElement.innerText =
+    String(Object.keys(s.players || {}).length);
+
+activeDeckNameElement.innerText =
+    deckNames[s.cardDeckType] || 'Fibonacci';
             document.getElementById('sm-panel').style.display = isSM ? 'block' : 'none';
             document.getElementById('sm-controls').style.display = isSM ? 'flex' : 'none';
 
