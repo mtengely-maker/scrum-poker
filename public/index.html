@@ -233,15 +233,17 @@
 
         .cards-container {
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     justify-content: center;
-    align-items: flex-end;
-    gap: 10px;
+    align-items: flex-start;
+    gap: 6px;
     width: 100%;
     max-width: 900px;
+    min-height: 108px;
     margin: 0 auto;
-    padding: 10px 6px 4px;
+    padding: 14px 6px 4px;
     box-sizing: border-box;
+    overflow: visible;
 }
 
 .card {
@@ -286,6 +288,12 @@
     font-weight: 900;
     line-height: 1;
 
+    transform:
+    translateY(var(--card-offset-y, 0px))
+    rotate(var(--card-rotation, 0deg));
+
+transform-origin: center bottom;
+
     transition:
         transform 160ms ease,
         box-shadow 160ms ease,
@@ -316,25 +324,37 @@
 }
 
 .card:hover {
-    transform: translateY(-8px) scale(1.04);
+    transform:
+        translateY(calc(var(--card-offset-y, 0px) - 10px))
+        rotate(0deg)
+        scale(1.04);
+
     border-color: var(--card-accent);
+
     box-shadow:
         0 14px 22px rgba(0, 0, 0, 0.48),
         0 0 0 2px var(--card-accent-soft),
         inset 0 0 0 2px #fffdf5,
         inset 0 0 0 4px var(--card-accent-soft);
+
     z-index: 10;
 }
 
 .card.selected {
-    transform: translateY(-12px) scale(1.07);
+    transform:
+        translateY(calc(var(--card-offset-y, 0px) - 14px))
+        rotate(0deg)
+        scale(1.07);
+
     border-color: #818cf8;
+
     box-shadow:
         0 16px 26px rgba(0, 0, 0, 0.55),
         0 0 0 3px rgba(99, 102, 241, 0.46),
         0 0 24px rgba(99, 102, 241, 0.5),
         inset 0 0 0 2px #fffdf5,
         inset 0 0 0 4px var(--card-accent-soft);
+
     z-index: 20;
 }
 
@@ -701,10 +721,29 @@
         'card-suit-blue'
     ];
 
+    const cardCount = deck.length;
+    const centerIndex = (cardCount - 1) / 2;
+
+    let maximumRotation;
+    let maximumOffset;
+
+    if (deckType === 'extended') {
+        maximumRotation = 6;
+        maximumOffset = 9;
+    } else if (deckType === 'tshirt') {
+        maximumRotation = 7;
+        maximumOffset = 11;
+    } else {
+        // Alapértelmezett: Fibonacci
+        maximumRotation = 8;
+        maximumOffset = 12;
+    }
+
     deck.forEach((value, index) => {
         const card = document.createElement('div');
 
-        let cardStyleClass = suitClasses[index % suitClasses.length];
+        let cardStyleClass =
+            suitClasses[index % suitClasses.length];
 
         if (value === '?') {
             cardStyleClass = 'card-special-question';
@@ -714,15 +753,39 @@
             cardStyleClass = 'card-special-coffee';
         }
 
+        const normalizedPosition =
+            centerIndex === 0
+                ? 0
+                : (index - centerIndex) / centerIndex;
+
+        const rotation =
+            normalizedPosition * maximumRotation;
+
+        const offsetY =
+            Math.pow(Math.abs(normalizedPosition), 1.7) *
+            maximumOffset;
+
         card.className = `card ${cardStyleClass}`;
         card.innerText = value;
         card.dataset.value = value;
         card.title = `${value} becslés`;
 
+        card.style.setProperty(
+            '--card-rotation',
+            `${rotation.toFixed(2)}deg`
+        );
+
+        card.style.setProperty(
+            '--card-offset-y',
+            `${offsetY.toFixed(2)}px`
+        );
+
         card.onclick = () => {
             document
                 .querySelectorAll('.card')
-                .forEach(item => item.classList.remove('selected'));
+                .forEach(item => {
+                    item.classList.remove('selected');
+                });
 
             card.classList.add('selected');
             socket.emit('vote', value);
