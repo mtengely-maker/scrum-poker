@@ -232,27 +232,148 @@
         }
 
         .cards-container {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 5px;
-            max-width: 600px;
-        }
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 10px;
+    width: 100%;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 10px 6px 4px;
+    box-sizing: border-box;
+}
 
-        .card {
-            width: 42px;
-            height: 58px;
-            background: #334155;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 14px;
-            border: 2px solid transparent;
-            transition: 0.1s;
-        }
+.card {
+    --card-accent: #b91c1c;
+    --card-accent-soft: rgba(185, 28, 28, 0.14);
+
+    position: relative;
+    width: 58px;
+    height: 84px;
+    flex: 0 0 auto;
+    overflow: hidden;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background:
+        radial-gradient(
+            circle at center,
+            var(--card-accent-soft) 0,
+            transparent 46%
+        ),
+        linear-gradient(
+            145deg,
+            #fffef8 0%,
+            #f5ecd7 100%
+        );
+
+    color: #172033;
+    border: 2px solid #e5d5ad;
+    border-radius: 9px;
+    box-shadow:
+        0 7px 14px rgba(0, 0, 0, 0.38),
+        inset 0 0 0 2px #fffdf5,
+        inset 0 0 0 4px var(--card-accent-soft);
+
+    cursor: pointer;
+    user-select: none;
+
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 24px;
+    font-weight: 900;
+    line-height: 1;
+
+    transition:
+        transform 160ms ease,
+        box-shadow 160ms ease,
+        border-color 160ms ease,
+        filter 160ms ease;
+}
+
+.card::before,
+.card::after {
+    content: attr(data-value);
+    position: absolute;
+    color: var(--card-accent);
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 9px;
+    font-weight: 900;
+    line-height: 1;
+}
+
+.card::before {
+    top: 7px;
+    left: 7px;
+}
+
+.card::after {
+    right: 7px;
+    bottom: 7px;
+    transform: rotate(180deg);
+}
+
+.card:hover {
+    transform: translateY(-8px) scale(1.04);
+    border-color: var(--card-accent);
+    box-shadow:
+        0 14px 22px rgba(0, 0, 0, 0.48),
+        0 0 0 2px var(--card-accent-soft),
+        inset 0 0 0 2px #fffdf5,
+        inset 0 0 0 4px var(--card-accent-soft);
+    z-index: 10;
+}
+
+.card.selected {
+    transform: translateY(-12px) scale(1.07);
+    border-color: #818cf8;
+    box-shadow:
+        0 16px 26px rgba(0, 0, 0, 0.55),
+        0 0 0 3px rgba(99, 102, 241, 0.46),
+        0 0 24px rgba(99, 102, 241, 0.5),
+        inset 0 0 0 2px #fffdf5,
+        inset 0 0 0 4px var(--card-accent-soft);
+    z-index: 20;
+}
+
+.card.selected::before {
+    content: "✓";
+    color: #4f46e5;
+    font-family: sans-serif;
+    font-size: 11px;
+}
+
+.card-suit-red {
+    --card-accent: #b91c1c;
+    --card-accent-soft: rgba(185, 28, 28, 0.15);
+}
+
+.card-suit-green {
+    --card-accent: #047857;
+    --card-accent-soft: rgba(4, 120, 87, 0.15);
+}
+
+.card-suit-gold {
+    --card-accent: #b45309;
+    --card-accent-soft: rgba(180, 83, 9, 0.16);
+}
+
+.card-suit-blue {
+    --card-accent: #4338ca;
+    --card-accent-soft: rgba(67, 56, 202, 0.15);
+}
+
+.card-special-question {
+    --card-accent: #7c3aed;
+    --card-accent-soft: rgba(124, 58, 237, 0.17);
+}
+
+.card-special-coffee {
+    --card-accent: #92400e;
+    --card-accent-soft: rgba(146, 64, 14, 0.18);
+}
 
         .card.selected {
             border-color: var(--primary);
@@ -345,6 +466,30 @@
                 width: 240px;
                 height: 130px;
             }
+
+            .cards-container {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    max-width: none;
+    overflow-x: auto;
+    overflow-y: visible;
+    padding: 14px 10px 8px;
+    scroll-behavior: smooth;
+}
+
+.card {
+    width: 54px;
+    height: 78px;
+    font-size: 21px;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+}
+
+.card.selected {
+    transform: translateY(-8px) scale(1.04);
+}
         }
 
         ``
@@ -552,19 +697,48 @@
         });
 
         function renderCards(deckType) {
-            const container = document.getElementById('cards');
-            container.innerHTML = '';
-            const deck = decks[deckType] || decks.fibonacci;
-            deck.forEach(v => {
-                const d = document.createElement('div'); d.className = 'card'; d.innerText = v;
-                d.onclick = () => {
-                    document.querySelectorAll('.card').forEach(c => c.classList.remove('selected'));
-                    d.classList.add('selected');
-                    socket.emit('vote', v);
-                };
-                container.appendChild(d);
-            });
+    const container = document.getElementById('cards');
+    container.innerHTML = '';
+
+    const deck = decks[deckType] || decks.fibonacci;
+
+    const suitClasses = [
+        'card-suit-red',
+        'card-suit-green',
+        'card-suit-gold',
+        'card-suit-blue'
+    ];
+
+    deck.forEach((value, index) => {
+        const card = document.createElement('div');
+
+        let cardStyleClass = suitClasses[index % suitClasses.length];
+
+        if (value === '?') {
+            cardStyleClass = 'card-special-question';
         }
+
+        if (value === '☕') {
+            cardStyleClass = 'card-special-coffee';
+        }
+
+        card.className = `card ${cardStyleClass}`;
+        card.innerText = value;
+        card.dataset.value = value;
+        card.title = `${value} becslés`;
+
+        card.onclick = () => {
+            document
+                .querySelectorAll('.card')
+                .forEach(item => item.classList.remove('selected'));
+
+            card.classList.add('selected');
+            socket.emit('vote', value);
+        };
+
+        container.appendChild(card);
+    });
+}
 
         function getClosestValue(vals, deckType) {
             const deck = decks[deckType] || decks.fibonacci;
