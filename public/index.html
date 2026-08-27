@@ -124,17 +124,155 @@
         }
 
         .sidebar {
-            width: 240px;
-            margin-top: 76px;
-            padding: 15px;
-            height: calc(100vh - 76px);
-            background: var(--panel);
-            border-right: 1px solid #334155;
-            overflow-y: auto;
-            flex-shrink: 0;
-            box-sizing: border-box;
-        }
+    width: 260px;
+    margin-top: 76px;
+    padding: 16px 14px;
+    height: calc(100vh - 76px);
 
+    display: flex;
+    flex-direction: column;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(30, 41, 59, 0.99) 0%,
+            rgba(15, 23, 42, 0.99) 100%
+        );
+
+    border-right: 1px solid rgba(148, 163, 184, 0.18);
+
+    overflow: hidden;
+    flex-shrink: 0;
+    box-sizing: border-box;
+
+    box-shadow:
+        8px 0 24px rgba(0, 0, 0, 0.16),
+        inset -1px 0 0 rgba(255, 255, 255, 0.02);
+}
+
+.history-header {
+    flex: 0 0 auto;
+    margin-bottom: 12px;
+    padding: 2px 2px 11px;
+
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.history-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+}
+
+.history-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+
+    margin: 0;
+
+    color: #f8fafc;
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 0.01em;
+}
+
+.history-title-icon {
+    width: 27px;
+    height: 27px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(99, 102, 241, 0.13);
+    border: 1px solid rgba(129, 140, 248, 0.28);
+    border-radius: 8px;
+
+    color: #a5b4fc;
+    font-size: 13px;
+}
+
+.history-count {
+    min-width: 24px;
+    height: 22px;
+    padding: 0 7px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.2);
+    border-radius: 999px;
+
+    color: #cbd5e1;
+    font-size: 9px;
+    font-weight: 800;
+}
+
+.history-subtitle {
+    margin: 6px 0 0 35px;
+
+    color: #64748b;
+    font-size: 9px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.history-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    padding-right: 3px;
+
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color:
+        rgba(148, 163, 184, 0.38)
+        rgba(15, 23, 42, 0.25);
+}
+
+.history-list::-webkit-scrollbar {
+    width: 5px;
+}
+
+.history-list::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.25);
+    border-radius: 999px;
+}
+
+.history-list::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.38);
+    border-radius: 999px;
+}
+
+.history-empty {
+    margin-top: 8px;
+    padding: 20px 13px;
+
+    background: rgba(15, 23, 42, 0.44);
+    border: 1px dashed rgba(148, 163, 184, 0.2);
+    border-radius: 12px;
+
+    color: #64748b;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1.45;
+    text-align: center;
+}
+
+.history-empty-icon {
+    display: block;
+    margin-bottom: 7px;
+
+    color: #818cf8;
+    font-size: 20px;
+    opacity: 0.75;
+}
         .container {
             flex-grow: 1;
             margin-top: 76px;
@@ -799,23 +937,139 @@ transform-origin: center bottom;
 }
 
         .task-item {
-            padding: 6px 10px;
-            margin-bottom: 6px;
-            background: #334155;
-            border-radius: 4px;
-            font-size: 13px;
-            cursor: pointer;
-            transition: 0.2s;
-        }
+    position: relative;
 
-        .task-item:hover {
-            background: #475569;
-        }
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 8px;
 
-        .task-item.active {
-            border-left: 4px solid var(--primary);
-            background: #1e293b;
-        }
+    min-height: 44px;
+    margin-bottom: 7px;
+    padding: 7px 8px;
+
+    box-sizing: border-box;
+
+    background: rgba(51, 65, 85, 0.46);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 11px;
+
+    color: #cbd5e1;
+
+    transition:
+        background 160ms ease,
+        border-color 160ms ease,
+        transform 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.task-item.clickable {
+    cursor: pointer;
+}
+
+.task-item.clickable:hover {
+    background: rgba(71, 85, 105, 0.72);
+    border-color: rgba(129, 140, 248, 0.34);
+    transform: translateX(2px);
+
+    box-shadow:
+        0 6px 12px rgba(0, 0, 0, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 0.025);
+}
+
+.task-item.active {
+    background:
+        linear-gradient(
+            135deg,
+            rgba(49, 46, 129, 0.72) 0%,
+            rgba(30, 41, 59, 0.82) 100%
+        );
+
+    border-color: rgba(129, 140, 248, 0.52);
+
+    box-shadow:
+        0 7px 14px rgba(30, 27, 75, 0.28),
+        inset 3px 0 0 #818cf8;
+}
+
+.task-number {
+    width: 24px;
+    height: 24px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(15, 23, 42, 0.72);
+    border: 1px solid rgba(148, 163, 184, 0.17);
+    border-radius: 7px;
+
+    color: #94a3b8;
+    font-size: 9px;
+    font-weight: 900;
+}
+
+.task-item.active .task-number {
+    background: rgba(99, 102, 241, 0.23);
+    border-color: rgba(165, 180, 252, 0.3);
+    color: #c7d2fe;
+}
+
+.task-name {
+    min-width: 0;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    color: #e2e8f0;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.3;
+}
+
+.task-item.active .task-name {
+    color: #ffffff;
+}
+
+.task-result {
+    min-width: 29px;
+    height: 29px;
+    padding: 0 6px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    background:
+        linear-gradient(
+            145deg,
+            #fffef8 0%,
+            #f4e8c9 100%
+        );
+
+    border: 1px solid #d6ba76;
+    border-radius: 7px;
+
+    color: #312e81;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 10px;
+    font-weight: 900;
+
+    box-shadow:
+        0 4px 8px rgba(0, 0, 0, 0.24),
+        inset 0 0 0 1px #fffdf5;
+}
+
+.task-pending {
+    min-width: 29px;
+
+    color: #64748b;
+    font-size: 11px;
+    text-align: center;
+}
 .table-shape::before {
     content: "";
     position: absolute;
@@ -1014,16 +1268,94 @@ transform-origin: center bottom;
             }
 
             .sidebar {
-                width: 100%;
-                height: 130px;
-                margin-top: 68px;
-                border-right: none;
-                border-bottom: 1px solid #334155;
-                flex-shrink: 0;
-            }
+    width: 100%;
+    height: 132px;
+    margin-top: 68px;
+    padding: 8px 10px;
+
+    border-right: none;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+
+    flex-shrink: 0;
+}
+
+.history-header {
+    margin-bottom: 6px;
+    padding: 0 1px 6px;
+}
+
+.history-title {
+    font-size: 10px;
+}
+
+.history-title-icon {
+    width: 21px;
+    height: 21px;
+    font-size: 10px;
+}
+
+.history-count {
+    min-width: 21px;
+    height: 19px;
+    padding: 0 6px;
+    font-size: 8px;
+}
+
+.history-subtitle {
+    display: none;
+}
+
+.history-list {
+    display: flex;
+    gap: 7px;
+
+    padding: 1px 1px 5px;
+
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+
+.task-item {
+    flex: 0 0 180px;
+    grid-template-columns: 21px minmax(0, 1fr) auto;
+
+    min-height: 42px;
+    margin: 0;
+    padding: 6px 7px;
+}
+
+.task-number {
+    width: 21px;
+    height: 21px;
+    font-size: 8px;
+}
+
+.task-name {
+    font-size: 9px;
+}
+
+.task-result {
+    min-width: 26px;
+    height: 26px;
+    padding: 0 5px;
+    font-size: 9px;
+}
+
+.history-empty {
+    flex: 1 0 100%;
+    margin: 0;
+    padding: 10px;
+    font-size: 9px;
+}
+
+.history-empty-icon {
+    display: inline;
+    margin: 0 5px 0 0;
+    font-size: 13px;
+}
 
             .container {
-                height: calc(100vh - 198px);
+                height: calc(100vh - 200px);
                 margin-top: 0;
             }
 
@@ -1265,11 +1597,33 @@ transform-origin: center bottom;
             Planning Poker
         </div>
     </header>
-    <div class="sidebar">
-        <strong>Előzmények</strong>
-        <div style="font-size:11px; color:#94a3b8; margin-bottom:8px;">Kattints a váltáshoz</div>
-        <div id="history-list" style="margin-top:5px;"></div>
+    <aside class="sidebar">
+    <div class="history-header">
+        <div class="history-title-row">
+            <h2 class="history-title">
+                <span class="history-title-icon" aria-hidden="true">
+                    ☷
+                </span>
+
+                <span>Feladatok</span>
+            </h2>
+
+            <span
+                id="history-count"
+                class="history-count"
+                title="Feladatok száma"
+            >
+                0
+            </span>
+        </div>
+
+        <p id="history-subtitle" class="history-subtitle">
+            A becslések itt jelennek meg
+        </p>
     </div>
+
+    <div id="history-list" class="history-list"></div>
+</aside>
 
     <div class="container">
         <div id="login-screen" style="margin: auto; text-align: center; padding: 20px;">
@@ -1761,30 +2115,119 @@ if (p.isSM) {
                 tableArea.appendChild(seat);
             });
 
-            const list = document.getElementById('history-list');
-            list.innerHTML = '';
-            s.tasks.forEach((t, i) => {
-                let resText = "";
-                if (s.taskResults[i]) {
-                    const rawVotes = s.taskResults[i].filter(v => v !== null && v !== undefined);
-                    const numericVals = rawVotes.filter(v => !isNaN(v)).map(v => parseFloat(v));
+            const historyList =
+    document.getElementById('history-list');
 
-                    if (numericVals.length > 0) {
-                        const rec = getClosestValue(numericVals, s.cardDeckType);
-                        resText = ` [${rec}]`;
-                    } else if (rawVotes.length > 0) {
-                        const rec = getClosestValue(rawVotes, s.cardDeckType);
-                        resText = ` [${rec}]`;
-                    }
-                }
-                const div = document.createElement('div');
-                div.className = `task-item ${i === s.currentTaskIndex ? 'active' : ''}`;
-                div.innerText = `${i + 1}. ${t.trim()}${resText}`;
-                div.onclick = () => {
-                    if (isSM) socket.emit('goToTask', i);
-                };
-                list.appendChild(div);
-            });
+const historyCount =
+    document.getElementById('history-count');
+
+const historySubtitle =
+    document.getElementById('history-subtitle');
+
+historyList.innerHTML = '';
+historyCount.innerText = String(s.tasks.length);
+
+historySubtitle.innerText = isSM
+    ? 'Kattints egy feladatra a váltáshoz'
+    : 'A becslések itt jelennek meg';
+
+if (s.tasks.length === 0) {
+    const emptyState =
+        document.createElement('div');
+
+    emptyState.className = 'history-empty';
+
+    emptyState.innerHTML = `
+        <span class="history-empty-icon">♧</span>
+        Még nincsenek becslendő feladatok.
+    `;
+
+    historyList.appendChild(emptyState);
+} else {
+    s.tasks.forEach((task, index) => {
+        let result = null;
+
+        if (Array.isArray(s.taskResults[index])) {
+            const rawVotes = s.taskResults[index]
+                .filter(v =>
+                    v !== null &&
+                    v !== undefined
+                );
+
+            const numericValues = rawVotes
+                .filter(v => !isNaN(v))
+                .map(v => parseFloat(v));
+
+            if (numericValues.length > 0) {
+                result = getClosestValue(
+                    numericValues,
+                    s.cardDeckType
+                );
+            } else if (rawVotes.length > 0) {
+                result = getClosestValue(
+                    rawVotes,
+                    s.cardDeckType
+                );
+            }
+        }
+
+        const item =
+            document.createElement('div');
+
+        const isActive =
+            index === s.currentTaskIndex;
+
+        item.className = [
+            'task-item',
+            isActive ? 'active' : '',
+            isSM ? 'clickable' : ''
+        ]
+            .filter(Boolean)
+            .join(' ');
+
+        item.title = isSM
+            ? `${task.trim()} megnyitása`
+            : task.trim();
+
+        item.innerHTML = `
+            <span class="task-number">
+                ${index + 1}
+            </span>
+
+            <span class="task-name">
+                ${task.trim()}
+            </span>
+
+            ${
+                result !== null
+                    ? `
+                        <span
+                            class="task-result"
+                            title="Becsült érték"
+                        >
+                            ${result}
+                        </span>
+                    `
+                    : `
+                        <span
+                            class="task-pending"
+                            title="Még nincs eredmény"
+                        >
+                            •
+                        </span>
+                    `
+            }
+        `;
+
+        if (isSM) {
+            item.onclick = () => {
+                socket.emit('goToTask', index);
+            };
+        }
+
+        historyList.appendChild(item);
+    });
+}
         });
 
         document.addEventListener('DOMContentLoaded', () => {
