@@ -219,53 +219,167 @@
 }
 
         .seat {
-            position: absolute;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            transition: 0.3s;
-            z-index: 2;
-        }
+    position: absolute;
+    z-index: 2;
 
-        .avatar-container {
-            position: relative;
-        }
+    display: flex;
+    flex-direction: column;
+    align-items: center;
 
-        .avatar {
-            width: 40px;
-            height: 40px;
-            background: #334155;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            border: 2px solid var(--primary);
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
-        }
+    min-width: 84px;
 
-        .sm-badge {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            font-size: 14px;
-            background: #1e293b;
-            border-radius: 50%;
-            padding: 1px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
-        }
+    transition:
+        transform 300ms ease,
+        opacity 200ms ease;
+}
 
-        .seat-name {
-            font-size: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 2px 6px;
-            border-radius: 4px;
-            margin-top: 2px;
-            max-width: 70px;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+.avatar-container {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.avatar {
+    width: 46px;
+    height: 46px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    background:
+        radial-gradient(
+            circle at 35% 30%,
+            rgba(255, 255, 255, 0.16),
+            transparent 38%
+        ),
+        linear-gradient(
+            145deg,
+            #334155 0%,
+            #1e293b 100%
+        );
+
+    border: 2px solid #818cf8;
+    border-radius: 50%;
+
+    color: #f8fafc;
+    font-size: 21px;
+
+    box-shadow:
+        0 7px 14px rgba(0, 0, 0, 0.38),
+        0 0 0 3px rgba(99, 102, 241, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.sm-badge {
+    position: absolute;
+    top: -7px;
+    right: -10px;
+
+    min-width: 22px;
+    height: 22px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    background:
+        linear-gradient(
+            145deg,
+            #fef3c7 0%,
+            #f59e0b 100%
+        );
+
+    border: 2px solid #fffbeb;
+    border-radius: 50%;
+
+    color: #78350f;
+    font-size: 11px;
+    font-weight: 900;
+
+    box-shadow:
+        0 5px 10px rgba(0, 0, 0, 0.38),
+        0 0 0 2px rgba(245, 158, 11, 0.18);
+}
+
+.seat-name {
+    max-width: 92px;
+    margin-top: 5px;
+    padding: 3px 8px;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+
+    background: rgba(15, 23, 42, 0.9);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 999px;
+
+    color: #f1f5f9;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 1.2;
+
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.24);
+}
+
+.player-status {
+    min-width: 58px;
+    margin-top: 3px;
+    padding: 3px 7px;
+
+    box-sizing: border-box;
+
+    background: rgba(15, 23, 42, 0.88);
+    border: 1px solid rgba(148, 163, 184, 0.18);
+    border-radius: 999px;
+
+    color: #cbd5e1;
+    font-size: 9px;
+    font-weight: 700;
+    line-height: 1.2;
+    text-align: center;
+    white-space: nowrap;
+
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.22);
+}
+
+.player-status-waiting {
+    color: #cbd5e1;
+    border-color: rgba(148, 163, 184, 0.26);
+}
+
+.player-status-voted {
+    color: #6ee7b7;
+    background: rgba(6, 78, 59, 0.82);
+    border-color: rgba(52, 211, 153, 0.34);
+}
+
+.player-status-revealed {
+    color: #312e81;
+    background:
+        linear-gradient(
+            145deg,
+            #fffef8 0%,
+            #f4e8c9 100%
+        );
+    border-color: #d6ba76;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 11px;
+    font-weight: 900;
+}
+
+.player-status-facilitator {
+    color: #fde68a;
+    background: rgba(120, 53, 15, 0.78);
+    border-color: rgba(245, 158, 11, 0.4);
+}
 
         .cards-container {
     display: flex;
@@ -683,6 +797,42 @@ transform-origin: center bottom;
     height: 130px;
     padding: 14px 22px;
     border-width: 4px;
+}
+
+.seat {
+    min-width: 72px;
+}
+
+.avatar {
+    width: 40px;
+    height: 40px;
+    font-size: 18px;
+}
+
+.sm-badge {
+    top: -6px;
+    right: -8px;
+    min-width: 19px;
+    height: 19px;
+    font-size: 9px;
+}
+
+.seat-name {
+    max-width: 76px;
+    margin-top: 3px;
+    padding: 2px 6px;
+    font-size: 9px;
+}
+
+.player-status {
+    min-width: 52px;
+    margin-top: 2px;
+    padding: 2px 6px;
+    font-size: 8px;
+}
+
+.player-status-revealed {
+    font-size: 10px;
 }
 
 .table-shape::before {
@@ -1208,15 +1358,24 @@ if (hasRevealedResult) {
                 const y = Math.sin(angle) * radiusY;
 
                 // Ha Scrum Master, akkor nem szavaz, hanem bírói síp jelzést kap (🏴 vagy 🟨) státusz helyett
-                let voteContent = '';
-                if (p.isSM) {
-                    voteContent = '<span style="font-size:11px;">Játékvezető</span>';
-                } else {
-                    voteContent = p.vote ? (s.revealed ? p.vote : '✅') : '⏳';
-                }
+                let statusText = 'Várakozik';
+let statusClass = 'player-status-waiting';
+
+if (p.isSM) {
+    statusText = 'Játékvezető';
+    statusClass = 'player-status-facilitator';
+} else if (s.revealed && p.vote) {
+    statusText = p.vote;
+    statusClass = 'player-status-revealed';
+} else if (p.vote) {
+    statusText = 'Szavazott';
+    statusClass = 'player-status-voted';
+}
 
                 // Bírói síp / jelvény az avatar sarkában az SM-nek
-                const smBadgeHtml = p.isSM ? '<div class="sm-badge" title="Scrum Master">🟨</div>' : '';
+                const smBadgeHtml = p.isSM
+    ? '<div class="sm-badge" title="Játékvezető">★</div>'
+    : '';
 
                 const seat = document.createElement('div');
                 seat.className = 'seat';
@@ -1227,7 +1386,9 @@ if (hasRevealedResult) {
                         ${smBadgeHtml}
                     </div>
                     <div class="seat-name">${p.name}</div>
-                    <div style="font-size:10px; color:#cbd5e1; background:rgba(0,0,0,0.6); padding:1px 5px; border-radius:3px; margin-top:2px;">${voteContent}</div>
+                    <div class="player-status ${statusClass}">
+    ${statusText}
+</div>
                 `;
                 tableArea.appendChild(seat);
             });
