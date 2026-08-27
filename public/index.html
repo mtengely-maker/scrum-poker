@@ -727,7 +727,7 @@ transform-origin: center bottom;
             alert(message || 'A szerepkör módosítása nem sikerült.');
         });
 
-        function renderCards(deckType) {
+        function renderCards(deckType, selectedVote = null) {
     const container = document.getElementById('cards');
     container.innerHTML = '';
 
@@ -796,7 +796,13 @@ container.classList.add(`deck-${activeDeckType}`);
             Math.pow(Math.abs(normalizedPosition), 1.7) *
             maximumOffset;
 
-        card.className = `card ${cardStyleClass}`;
+        const isSelected =
+    selectedVote !== null &&
+    selectedVote !== undefined &&
+    String(selectedVote) === String(value);
+
+card.className =
+    `card ${cardStyleClass}${isSelected ? ' selected' : ''}`;
         card.innerText = value;
         card.dataset.value = value;
         card.title = `${value} becslés`;
@@ -859,6 +865,7 @@ container.classList.add(`deck-${activeDeckType}`);
 
         socket.on('state', (s) => {
             const isSM = s.players[socket.id]?.isSM;
+            const selectedVote = s.players[socket.id]?.vote ?? null;
 
             document.getElementById('sm-panel').style.display = isSM ? 'block' : 'none';
             document.getElementById('sm-controls').style.display = isSM ? 'flex' : 'none';
@@ -866,7 +873,10 @@ container.classList.add(`deck-${activeDeckType}`);
             // Scrum Master elől elrejtjük a szavazókártyákat is
             document.getElementById('cards-wrapper').style.display = isSM ? 'none' : 'block';
 
-            renderCards(s.cardDeckType || 'fibonacci');
+            renderCards(
+    s.cardDeckType || 'fibonacci',
+    selectedVote
+);
             document.getElementById('task-title').innerText = s.tasks[s.currentTaskIndex] ? s.tasks[s.currentTaskIndex] : "Nincs aktív feladat";
 
             if (s.revealed && s.taskResults[s.currentTaskIndex]) {
