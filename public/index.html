@@ -1,103 +1,426 @@
 <!DOCTYPE html>
 <html lang="hu">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Scrum Poker Pro</title>
     <style>
-        :root { --primary: #6366f1; --primary-hover: #4f46e5; --bg: #0f172a; --panel: #1e293b; --table: #065f46; }
-        body { margin: 0; background: var(--bg); color: white; font-family: sans-serif; height: 100vh; overflow: hidden; display: flex; flex-direction: row; }
-        
-        .sidebar { width: 240px; background: var(--panel); padding: 15px; border-right: 1px solid #334155; overflow-y: auto; flex-shrink: 0; height: 100vh; box-sizing: border-box; }
-        .container { flex-grow: 1; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; align-items: center; height: 100vh; box-sizing: border-box; overflow-y: auto; }
-        
-        .controls { background: var(--panel); padding: 10px; border-radius: 10px; width: 100%; max-width: 500px; text-align: center; }
-        
-        .table-area { flex-grow: 1; position: relative; width: 100%; min-height: 200px; display: flex; justify-content: center; align-items: center; }
-        .table-shape { width: 300px; height: 160px; background: var(--table); border-radius: 100px; border: 4px solid #047857; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; box-shadow: inset 0 0 30px rgba(0,0,0,0.5); z-index: 1; }
-        
-        .seat { position: absolute; display: flex; flex-direction: column; align-items: center; transition: 0.3s; z-index: 2; }
-        .avatar-container { position: relative; }
-        .avatar { width: 40px; height: 40px; background: #334155; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 18px; border: 2px solid var(--primary); box-shadow: 0 4px 6px rgba(0,0,0,0.3); }
-        .sm-badge { position: absolute; top: -5px; right: -5px; font-size: 14px; background: #1e293b; border-radius: 50%; padding: 1px; box-shadow: 0 2px 4px rgba(0,0,0,0.4); }
-        .seat-name { font-size: 10px; background: rgba(0,0,0,0.7); padding: 2px 6px; border-radius: 4px; margin-top: 2px; max-width: 70px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        :root {
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --bg: #0f172a;
+            --panel: #1e293b;
+            --table: #065f46;
+        }
 
-        .cards-container { display: flex; flex-wrap: wrap; justify-content: center; gap: 5px; max-width: 600px; }
-        .card { width: 42px; height: 58px; background: #334155; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 6px; font-weight: bold; font-size: 14px; border: 2px solid transparent; transition: 0.1s; }
-        .card.selected { border-color: var(--primary); background: #312e81; transform: translateY(-4px); }
-        
-        .btn { padding: 8px 16px; border-radius: 6px; border: none; background: var(--primary); color: white; cursor: pointer; font-weight: bold; }
-        .btn:hover { background: var(--primary-hover); }
-        .btn-danger { background: #e11d48; }
-        
-        .task-item { padding: 6px 10px; margin-bottom: 6px; background: #334155; border-radius: 4px; font-size: 13px; cursor: pointer; transition: 0.2s; }
-        .task-item:hover { background: #475569; }
-        .task-item.active { border-left: 4px solid var(--primary); background: #1e293b; }
+        .app-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 76px;
+            padding: 0 24px;
+            background: rgba(15, 23, 42, 0.96);
+            border-bottom: 1px solid #334155;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            box-sizing: border-box;
+            z-index: 100;
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            min-width: 0;
+        }
+
+        .app-brand-text {
+            min-width: 0;
+        }
+
+        .app-title {
+            margin: 0;
+            color: #f8fafc;
+            font-size: 20px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+            white-space: nowrap;
+        }
+
+        .app-subtitle {
+            margin: 3px 0 0;
+            color: #94a3b8;
+            font-size: 11px;
+            letter-spacing: 0.04em;
+        }
+
+        .app-header-badge {
+            padding: 6px 10px;
+            border: 1px solid rgba(99, 102, 241, 0.4);
+            border-radius: 999px;
+            background: rgba(99, 102, 241, 0.1);
+            color: #a5b4fc;
+            font-size: 11px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .brand-logo {
+            position: relative;
+            width: 54px;
+            height: 46px;
+            flex-shrink: 0;
+        }
+
+        .brand-card {
+            position: absolute;
+            top: 5px;
+            left: 16px;
+            width: 27px;
+            height: 37px;
+            border: 2px solid #f8fafc;
+            border-radius: 5px;
+            background: #fffdf5;
+            color: #312e81;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            font-size: 12px;
+            font-weight: 900;
+            box-shadow: 0 5px 10px rgba(0, 0, 0, 0.35);
+        }
+
+        .brand-card-left {
+            transform: translateX(-10px) rotate(-16deg);
+            color: #b91c1c;
+        }
+
+        .brand-card-middle {
+            z-index: 2;
+            transform: translateY(-3px);
+            color: #312e81;
+        }
+
+        .brand-card-right {
+            transform: translateX(10px) rotate(16deg);
+            color: #047857;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: white;
+            font-family: sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: row;
+        }
+
+        .sidebar {
+            width: 240px;
+            margin-top: 76px;
+            padding: 15px;
+            height: calc(100vh - 76px);
+            background: var(--panel);
+            border-right: 1px solid #334155;
+            overflow-y: auto;
+            flex-shrink: 0;
+            box-sizing: border-box;
+        }
+
+        .container {
+            flex-grow: 1;
+            margin-top: 76px;
+            padding: 15px;
+            height: calc(100vh - 76px);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .controls {
+            background: var(--panel);
+            padding: 10px;
+            border-radius: 10px;
+            width: 100%;
+            max-width: 500px;
+            text-align: center;
+        }
+
+        .table-area {
+            flex-grow: 1;
+            position: relative;
+            width: 100%;
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .table-shape {
+            width: 300px;
+            height: 160px;
+            background: var(--table);
+            border-radius: 100px;
+            border: 4px solid #047857;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .seat {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            transition: 0.3s;
+            z-index: 2;
+        }
+
+        .avatar-container {
+            position: relative;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: #334155;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            border: 2px solid var(--primary);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        .sm-badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            font-size: 14px;
+            background: #1e293b;
+            border-radius: 50%;
+            padding: 1px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+        }
+
+        .seat-name {
+            font-size: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-top: 2px;
+            max-width: 70px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .cards-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 5px;
+            max-width: 600px;
+        }
+
+        .card {
+            width: 42px;
+            height: 58px;
+            background: #334155;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 14px;
+            border: 2px solid transparent;
+            transition: 0.1s;
+        }
+
+        .card.selected {
+            border-color: var(--primary);
+            background: #312e81;
+            transform: translateY(-4px);
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: none;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-danger {
+            background: #e11d48;
+        }
+
+        .task-item {
+            padding: 6px 10px;
+            margin-bottom: 6px;
+            background: #334155;
+            border-radius: 4px;
+            font-size: 13px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .task-item:hover {
+            background: #475569;
+        }
+
+        .task-item.active {
+            border-left: 4px solid var(--primary);
+            background: #1e293b;
+        }
 
         @media (max-width: 768px) {
-            body { flex-direction: column; height: 100vh; overflow: hidden; }
-            .sidebar { width: 100%; height: 130px; border-right: none; border-bottom: 1px solid #334155; flex-shrink: 0; }
-            .container { height: calc(100vh - 130px); }
-            .table-shape { width: 240px; height: 130px; }
+            body {
+                flex-direction: column;
+                height: 100vh;
+                overflow: hidden;
+            }
+
+            .app-header {
+                height: 68px;
+                padding: 0 14px;
+            }
+
+            .app-title {
+                font-size: 16px;
+            }
+
+            .app-subtitle {
+                display: none;
+            }
+
+            .app-header-badge {
+                display: none;
+            }
+
+            .brand-logo {
+                width: 48px;
+                transform: scale(0.88);
+                transform-origin: left center;
+            }
+
+            .sidebar {
+                width: 100%;
+                height: 130px;
+                margin-top: 68px;
+                border-right: none;
+                border-bottom: 1px solid #334155;
+                flex-shrink: 0;
+            }
+
+            .container {
+                height: calc(100vh - 198px);
+                margin-top: 0;
+            }
+
+            .table-shape {
+                width: 240px;
+                height: 130px;
+            }
         }
+
+        ``
     </style>
 </head>
+
 <body>
+    <header class="app-header">
+        <div class="app-brand">
+            <div class="brand-logo" aria-hidden="true">
+                <div class="brand-card brand-card-left">3</div>
+                <div class="brand-card brand-card-middle">5</div>
+                <div class="brand-card brand-card-right">8</div>
+            </div>
+
+            <div class="app-brand-text">
+                <h1 class="app-title">Technical Squad Scrum Poker</h1>
+                <p class="app-subtitle">Közös becslés, közös döntés</p>
+            </div>
+        </div>
+
+        <div class="app-header-badge">
+            Planning Poker
+        </div>
+    </header>
     <div class="sidebar">
         <strong>Előzmények</strong>
         <div style="font-size:11px; color:#94a3b8; margin-bottom:8px;">Kattints a váltáshoz</div>
         <div id="history-list" style="margin-top:5px;"></div>
     </div>
-    
+
     <div class="container">
         <div id="login-screen" style="margin: auto; text-align: center; padding: 20px;">
-    <h2>Csatlakozás</h2>
+            <h2>Csatlakozás</h2>
 
-    <div style="margin-bottom: 12px;">
-        <label for="username" style="display:block; font-size:13px; color:#cbd5e1; margin-bottom:5px;">
-            Név
-        </label>
+            <div style="margin-bottom: 12px;">
+                <label for="username" style="display:block; font-size:13px; color:#cbd5e1; margin-bottom:5px;">
+                    Név
+                </label>
 
-        <input
-            type="text"
-            id="username"
-            placeholder="Neved..."
-            autocomplete="name"
-            style="padding:10px; border-radius:6px; border:none; width:200px; box-sizing:border-box;"
-        >
-    </div>
+                <input type="text" id="username" placeholder="Neved..." autocomplete="name"
+                    style="padding:10px; border-radius:6px; border:none; width:200px; box-sizing:border-box;">
+            </div>
 
-    <div style="margin-bottom: 12px;">
-        <label for="role-select" style="display:block; font-size:13px; color:#cbd5e1; margin-bottom:5px;">
-            Szerepkör
-        </label>
+            <div style="margin-bottom: 12px;">
+                <label for="role-select" style="display:block; font-size:13px; color:#cbd5e1; margin-bottom:5px;">
+                    Szerepkör
+                </label>
 
-        <select
-            id="role-select"
-            style="padding:10px; border-radius:6px; border:none; width:200px; box-sizing:border-box; background:#334155; color:white;"
-        >
-            <option value="player" selected>Játékos</option>
-            <option value="facilitator">Játékvezető</option>
-        </select>
-    </div>
+                <select id="role-select"
+                    style="padding:10px; border-radius:6px; border:none; width:200px; box-sizing:border-box; background:#334155; color:white;">
+                    <option value="player" selected>Játékos</option>
+                    <option value="facilitator">Játékvezető</option>
+                </select>
+            </div>
 
-    <div
-        id="login-error"
-        style="display:none; max-width:300px; margin:0 auto 12px; padding:8px 10px; border-radius:6px; background:#7f1d1d; color:#fecaca; font-size:12px;"
-    ></div>
+            <div id="login-error"
+                style="display:none; max-width:300px; margin:0 auto 12px; padding:8px 10px; border-radius:6px; background:#7f1d1d; color:#fecaca; font-size:12px;">
+            </div>
 
-    <button id="join-button" class="btn" onclick="join()">
-        Belépés
-    </button>
-</div>
+            <button id="join-button" class="btn" onclick="join()">
+                Belépés
+            </button>
+        </div>
 
 
-        <div id="game-screen" style="display:none; width:100%; height:100%; flex-direction:column; align-items:center; justify-content:space-between;">
+        <div id="game-screen"
+            style="display:none; width:100%; height:100%; flex-direction:column; align-items:center; justify-content:space-between;">
             <div id="sm-panel" class="controls" style="display:none; margin-bottom: 5px;">
-                <textarea id="tasks" rows="2" placeholder="Feladatok (soronként)..." style="width:90%; padding:6px; border-radius:6px; resize:none;"></textarea>
-                <div style="margin-top:5px; display:flex; justify-content:center; align-items:center; gap:10px; font-size: 13px;">
+                <textarea id="tasks" rows="2" placeholder="Feladatok (soronként)..."
+                    style="width:90%; padding:6px; border-radius:6px; resize:none;"></textarea>
+                <div
+                    style="margin-top:5px; display:flex; justify-content:center; align-items:center; gap:10px; font-size: 13px;">
                     <label>Skála:</label>
-                    <select id="deck-select" style="padding:4px; border-radius:4px; background:#334155; color:white; border:none;">
+                    <select id="deck-select"
+                        style="padding:4px; border-radius:4px; background:#334155; color:white; border:none;">
                         <option value="fibonacci">Fibonacci (1..21)</option>
                         <option value="extended">Kiterjesztett (0..100)</option>
                         <option value="tshirt">T-Shirt (XS..XXL)</option>
@@ -105,18 +428,22 @@
                 </div>
                 <div style="margin-top:5px; display:flex; justify-content:center; gap:10px;">
                     <button class="btn" onclick="start()" style="padding:5px 10px; font-size:12px;">Indítás</button>
-                    <button class="btn btn-danger" onclick="resetGame()" style="padding:5px 10px; font-size:12px;">Reset</button>
-                </div>
-            </div>
-            
-            <div class="table-area" id="table-area">
-                <div class="table-shape">
-                    <div id="task-title" style="color: #cbd5e1; font-size: 13px; font-weight: bold; padding: 0 10px;">Várakozás...</div>
-                    <div id="avg-display" style="font-size: 2.2rem; font-weight: bold; color: #818cf8; margin-top: 4px;"></div>
+                    <button class="btn btn-danger" onclick="resetGame()"
+                        style="padding:5px 10px; font-size:12px;">Reset</button>
                 </div>
             </div>
 
-            <div style="width:100%; text-align:center; background: var(--panel); padding: 10px; border-radius: 10px; margin-top: 10px;">
+            <div class="table-area" id="table-area">
+                <div class="table-shape">
+                    <div id="task-title" style="color: #cbd5e1; font-size: 13px; font-weight: bold; padding: 0 10px;">
+                        Várakozás...</div>
+                    <div id="avg-display"
+                        style="font-size: 2.2rem; font-weight: bold; color: #818cf8; margin-top: 4px;"></div>
+                </div>
+            </div>
+
+            <div
+                style="width:100%; text-align:center; background: var(--panel); padding: 10px; border-radius: 10px; margin-top: 10px;">
                 <!-- Ha SM vagyunk, elrejtjük a kártyákat, hiszen ő nem szavaz -->
                 <div id="cards-wrapper">
                     <div id="cards" class="cards-container" style="margin-bottom: 8px;"></div>
@@ -139,91 +466,91 @@
         };
 
         function join() {
-    const nameInput = document.getElementById('username');
-    const roleSelect = document.getElementById('role-select');
-    const joinButton = document.getElementById('join-button');
-    const loginError = document.getElementById('login-error');
+            const nameInput = document.getElementById('username');
+            const roleSelect = document.getElementById('role-select');
+            const joinButton = document.getElementById('join-button');
+            const loginError = document.getElementById('login-error');
 
-    const name = nameInput.value.trim();
-    const role = roleSelect.value === 'facilitator'
-        ? 'facilitator'
-        : 'player';
+            const name = nameInput.value.trim();
+            const role = roleSelect.value === 'facilitator'
+                ? 'facilitator'
+                : 'player';
 
-    loginError.style.display = 'none';
-    loginError.innerText = '';
+            loginError.style.display = 'none';
+            loginError.innerText = '';
 
-    if (!name) {
-        loginError.innerText = 'Add meg a nevedet!';
-        loginError.style.display = 'block';
-        nameInput.focus();
-        return;
-    }
+            if (!name) {
+                loginError.innerText = 'Add meg a nevedet!';
+                loginError.style.display = 'block';
+                nameInput.focus();
+                return;
+            }
 
-    joinButton.disabled = true;
-    joinButton.innerText = 'Belépés...';
+            joinButton.disabled = true;
+            joinButton.innerText = 'Belépés...';
 
-    socket.emit('join', {
-        name,
-        role
-    });
-}
+            socket.emit('join', {
+                name,
+                role
+            });
+        }
 
-socket.on('joinSuccess', ({ player }) => {
-    const joinButton = document.getElementById('join-button');
-    const roleSelect = document.getElementById('role-select');
-    const loginError = document.getElementById('login-error');
+        socket.on('joinSuccess', ({player}) => {
+            const joinButton = document.getElementById('join-button');
+            const roleSelect = document.getElementById('role-select');
+            const loginError = document.getElementById('login-error');
 
-    joinButton.disabled = false;
-    joinButton.innerText = 'Belépés';
+            joinButton.disabled = false;
+            joinButton.innerText = 'Belépés';
 
-    loginError.style.display = 'none';
-    loginError.innerText = '';
+            loginError.style.display = 'none';
+            loginError.innerText = '';
 
-    localStorage.setItem(
-        'scrumPokerLastRole',
-        player.role || roleSelect.value || 'player'
-    );
+            localStorage.setItem(
+                'scrumPokerLastRole',
+                player.role || roleSelect.value || 'player'
+            );
 
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('game-screen').style.display = 'flex';
-});
-        function start() { 
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'flex';
+        });
+        function start() {
             const tasksText = document.getElementById('tasks').value;
             const deckType = document.getElementById('deck-select').value;
-            if(tasksText) socket.emit('addTasks', { tasks: tasksText.split('\n'), deckType }); 
+            if (tasksText) socket.emit('addTasks', {tasks: tasksText.split('\n'), deckType});
         }
         function resetGame() {
-    socket.emit('resetGame');
+            socket.emit('resetGame');
 
-    document.getElementById('tasks').value = '';
-    document.getElementById('avg-display').innerText = '';
+            document.getElementById('tasks').value = '';
+            document.getElementById('avg-display').innerText = '';
 
-    document
-        .querySelectorAll('.card')
-        .forEach(card => card.classList.remove('selected'));
-}
+            document
+                .querySelectorAll('.card')
+                .forEach(card => card.classList.remove('selected'));
+        }
 
-socket.on('joinError', ({ message }) => {
-    const joinButton = document.getElementById('join-button');
-    const loginError = document.getElementById('login-error');
+        socket.on('joinError', ({message}) => {
+            const joinButton = document.getElementById('join-button');
+            const loginError = document.getElementById('login-error');
 
-    joinButton.disabled = false;
-    joinButton.innerText = 'Belépés';
+            joinButton.disabled = false;
+            joinButton.innerText = 'Belépés';
 
-    loginError.innerText =
-        message || 'A belépés nem sikerült.';
+            loginError.innerText =
+                message || 'A belépés nem sikerült.';
 
-    loginError.style.display = 'block';
-});
+            loginError.style.display = 'block';
+        });
 
-socket.on('actionError', ({ message }) => {
-    alert(message || 'A művelet nem hajtható végre.');
-});
+        socket.on('actionError', ({message}) => {
+            alert(message || 'A művelet nem hajtható végre.');
+        });
 
-socket.on('roleChangeError', ({ message }) => {
-    alert(message || 'A szerepkör módosítása nem sikerült.');
-});
-        
+        socket.on('roleChangeError', ({message}) => {
+            alert(message || 'A szerepkör módosítása nem sikerült.');
+        });
+
         function renderCards(deckType) {
             const container = document.getElementById('cards');
             container.innerHTML = '';
@@ -248,8 +575,8 @@ socket.on('roleChangeError', ({ message }) => {
                 vals.forEach(v => counts[v] = (counts[v] || 0) + 1);
                 let maxVal = vals[0];
                 let maxCount = 0;
-                for(let v in counts) {
-                    if(counts[v] > maxCount) {
+                for (let v in counts) {
+                    if (counts[v] > maxCount) {
                         maxCount = counts[v];
                         maxVal = v;
                     }
@@ -257,12 +584,12 @@ socket.on('roleChangeError', ({ message }) => {
                 return maxVal;
             }
 
-            const avg = vals.reduce((a,b)=>a+b,0)/vals.length;
+            const avg = vals.reduce((a, b) => a + b, 0) / vals.length;
             let closest = numericDeck[0];
             let minDiff = Math.abs(avg - closest);
-            for(let i = 1; i < numericDeck.length; i++) {
+            for (let i = 1; i < numericDeck.length; i++) {
                 let diff = Math.abs(avg - numericDeck[i]);
-                if(diff < minDiff) {
+                if (diff < minDiff) {
                     minDiff = diff;
                     closest = numericDeck[i];
                 }
@@ -272,36 +599,36 @@ socket.on('roleChangeError', ({ message }) => {
 
         socket.on('state', (s) => {
             const isSM = s.players[socket.id]?.isSM;
-            
+
             document.getElementById('sm-panel').style.display = isSM ? 'block' : 'none';
             document.getElementById('sm-controls').style.display = isSM ? 'flex' : 'none';
-            
+
             // Scrum Master elől elrejtjük a szavazókártyákat is
             document.getElementById('cards-wrapper').style.display = isSM ? 'none' : 'block';
 
             renderCards(s.cardDeckType || 'fibonacci');
             document.getElementById('task-title').innerText = s.tasks[s.currentTaskIndex] ? s.tasks[s.currentTaskIndex] : "Nincs aktív feladat";
-            
-            if(s.revealed && s.taskResults[s.currentTaskIndex]) {
+
+            if (s.revealed && s.taskResults[s.currentTaskIndex]) {
                 const rawVotes = s.taskResults[s.currentTaskIndex].filter(v => v !== null && v !== undefined);
                 const numericVals = rawVotes.filter(v => !isNaN(v)).map(v => parseFloat(v));
-                
-                if(numericVals.length > 0) {
+
+                if (numericVals.length > 0) {
                     const recommended = getClosestValue(numericVals, s.cardDeckType);
                     document.getElementById('avg-display').innerText = recommended;
-                } else if(rawVotes.length > 0) {
+                } else if (rawVotes.length > 0) {
                     const recommended = getClosestValue(rawVotes, s.cardDeckType);
                     document.getElementById('avg-display').innerText = recommended;
                 } else {
                     document.getElementById('avg-display').innerText = "-";
                 }
-            } else { 
-                document.getElementById('avg-display').innerText = ""; 
+            } else {
+                document.getElementById('avg-display').innerText = "";
             }
 
             const tableArea = document.getElementById('table-area');
             document.querySelectorAll('.seat').forEach(el => el.remove());
-            
+
             const players = Object.values(s.players);
             players.forEach((p, i) => {
                 const angle = (i / players.length) * 2 * Math.PI - Math.PI / 2;
@@ -335,54 +662,55 @@ socket.on('roleChangeError', ({ message }) => {
                 tableArea.appendChild(seat);
             });
 
-            const list = document.getElementById('history-list'); 
+            const list = document.getElementById('history-list');
             list.innerHTML = '';
             s.tasks.forEach((t, i) => {
                 let resText = "";
-                if(s.taskResults[i]) {
+                if (s.taskResults[i]) {
                     const rawVotes = s.taskResults[i].filter(v => v !== null && v !== undefined);
                     const numericVals = rawVotes.filter(v => !isNaN(v)).map(v => parseFloat(v));
-                    
-                    if(numericVals.length > 0) {
+
+                    if (numericVals.length > 0) {
                         const rec = getClosestValue(numericVals, s.cardDeckType);
                         resText = ` [${rec}]`;
-                    } else if(rawVotes.length > 0) {
+                    } else if (rawVotes.length > 0) {
                         const rec = getClosestValue(rawVotes, s.cardDeckType);
                         resText = ` [${rec}]`;
                     }
                 }
                 const div = document.createElement('div');
                 div.className = `task-item ${i === s.currentTaskIndex ? 'active' : ''}`;
-                div.innerText = `${i+1}. ${t.trim()}${resText}`;
+                div.innerText = `${i + 1}. ${t.trim()}${resText}`;
                 div.onclick = () => {
-                    if(isSM) socket.emit('goToTask', i);
+                    if (isSM) socket.emit('goToTask', i);
                 };
                 list.appendChild(div);
             });
         });
-      
+
         document.addEventListener('DOMContentLoaded', () => {
-    const savedRole =
-        localStorage.getItem('scrumPokerLastRole');
+            const savedRole =
+                localStorage.getItem('scrumPokerLastRole');
 
-    const roleSelect =
-        document.getElementById('role-select');
+            const roleSelect =
+                document.getElementById('role-select');
 
-    if (
-        savedRole === 'player' ||
-        savedRole === 'facilitator'
-    ) {
-        roleSelect.value = savedRole;
-    }
-
-    document
-        .getElementById('username')
-        .addEventListener('keydown', event => {
-            if (event.key === 'Enter') {
-                join();
+            if (
+                savedRole === 'player' ||
+                savedRole === 'facilitator'
+            ) {
+                roleSelect.value = savedRole;
             }
+
+            document
+                .getElementById('username')
+                .addEventListener('keydown', event => {
+                    if (event.key === 'Enter') {
+                        join();
+                    }
+                });
         });
-});
     </script>
 </body>
+
 </html>
