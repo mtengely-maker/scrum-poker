@@ -826,9 +826,33 @@
 }
 
 .login-form {
+    width: 100%;
+
     display: flex;
     flex-direction: column;
     gap: 13px;
+
+    visibility: visible;
+    opacity: 1;
+}
+
+.login-form .login-field,
+.login-form .login-submit {
+    display: flex;
+    visibility: visible;
+    opacity: 1;
+}
+
+.login-form .login-field {
+    flex-direction: column;
+}
+
+.login-form .login-select {
+    display: block;
+}
+
+.login-form .login-submit {
+    width: 100%;
 }
 
 .login-field {
@@ -2440,7 +2464,10 @@ transform-origin: center bottom;
                 Szerepkör
             </label>
 
-            <select id="role-select" class="login-select">
+            <select
+                id="role-select"
+                class="login-select"
+            >
                 <option value="player" selected>
                     Játékos
                 </option>
@@ -2451,9 +2478,13 @@ transform-origin: center bottom;
             </select>
         </div>
 
-        <div id="login-error" class="login-error"></div>
+        <div
+            id="login-error"
+            class="login-error"
+        ></div>
 
         <button
+            type="button"
             id="join-button"
             class="btn login-submit"
             onclick="join()"
