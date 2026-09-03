@@ -107,6 +107,343 @@
         inset 0 1px 0 rgba(255, 255, 255, 0.03);
 }
 
+.help-button {
+    min-height: 31px;
+    padding: 0 11px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+
+    box-sizing: border-box;
+
+    background: rgba(99, 102, 241, 0.12);
+    border: 1px solid rgba(129, 140, 248, 0.28);
+    border-radius: 9px;
+
+    color: #c7d2fe;
+    font-family: inherit;
+    font-size: 9px;
+    font-weight: 800;
+
+    cursor: pointer;
+
+    transition:
+        background 160ms ease,
+        border-color 160ms ease,
+        transform 160ms ease,
+        box-shadow 160ms ease;
+}
+
+.help-button:hover {
+    background: rgba(99, 102, 241, 0.22);
+    border-color: rgba(165, 180, 252, 0.48);
+    transform: translateY(-1px);
+
+    box-shadow:
+        0 6px 13px rgba(30, 27, 75, 0.22),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+.help-button:active {
+    transform: translateY(0);
+}
+
+.help-button-icon {
+    width: 17px;
+    height: 17px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(129, 140, 248, 0.18);
+    border: 1px solid rgba(165, 180, 252, 0.24);
+    border-radius: 50%;
+
+    color: #e0e7ff;
+    font-size: 10px;
+    font-weight: 900;
+}
+
+.help-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+
+    display: none;
+    align-items: center;
+    justify-content: center;
+
+    padding: 22px;
+    box-sizing: border-box;
+
+    background: rgba(2, 6, 23, 0.78);
+    backdrop-filter: blur(8px);
+}
+
+.help-modal.open {
+    display: flex;
+}
+
+.help-dialog {
+    width: min(100%, 760px);
+    max-height: min(84vh, 720px);
+
+    display: flex;
+    flex-direction: column;
+
+    overflow: hidden;
+
+    background:
+        radial-gradient(
+            circle at 85% 8%,
+            rgba(99, 102, 241, 0.14) 0%,
+            transparent 32%
+        ),
+        linear-gradient(
+            145deg,
+            #1e293b 0%,
+            #0f172a 100%
+        );
+
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 22px;
+
+    box-shadow:
+        0 30px 80px rgba(0, 0, 0, 0.52),
+        inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.help-dialog-header {
+    flex: 0 0 auto;
+
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+
+    padding: 18px 20px;
+
+    border-bottom: 1px solid rgba(148, 163, 184, 0.16);
+}
+
+.help-dialog-heading {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+
+    min-width: 0;
+}
+
+.help-dialog-icon {
+    width: 37px;
+    height: 37px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+
+    background: rgba(99, 102, 241, 0.16);
+    border: 1px solid rgba(129, 140, 248, 0.3);
+    border-radius: 11px;
+
+    color: #c7d2fe;
+    font-size: 17px;
+}
+
+.help-dialog-title {
+    margin: 0;
+
+    color: #f8fafc;
+    font-size: 16px;
+    font-weight: 850;
+    letter-spacing: -0.015em;
+}
+
+.help-dialog-subtitle {
+    margin: 3px 0 0;
+
+    color: #94a3b8;
+    font-size: 9px;
+    line-height: 1.4;
+}
+
+.help-close-icon {
+    width: 31px;
+    height: 31px;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+
+    background: rgba(51, 65, 85, 0.54);
+    border: 1px solid rgba(148, 163, 184, 0.16);
+    border-radius: 9px;
+
+    color: #94a3b8;
+    font-size: 17px;
+
+    cursor: pointer;
+
+    transition:
+        color 150ms ease,
+        background 150ms ease,
+        border-color 150ms ease;
+}
+
+.help-close-icon:hover {
+    color: #ffffff;
+    background: rgba(71, 85, 105, 0.72);
+    border-color: rgba(148, 163, 184, 0.3);
+}
+
+.help-dialog-content {
+    flex: 1 1 auto;
+    min-height: 0;
+
+    overflow-y: auto;
+
+    padding: 18px 20px 21px;
+
+    scrollbar-width: thin;
+    scrollbar-color:
+        rgba(148, 163, 184, 0.38)
+        rgba(15, 23, 42, 0.2);
+}
+
+.help-intro {
+    margin: 0 0 17px;
+
+    color: #cbd5e1;
+    font-size: 11px;
+    line-height: 1.6;
+}
+
+.help-section-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 11px;
+}
+
+.help-section {
+    padding: 14px;
+
+    background: rgba(15, 23, 42, 0.54);
+    border: 1px solid rgba(148, 163, 184, 0.15);
+    border-radius: 13px;
+}
+
+.help-section-wide {
+    grid-column: 1 / -1;
+}
+
+.help-section-title {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+
+    margin: 0 0 8px;
+
+    color: #f1f5f9;
+    font-size: 11px;
+    font-weight: 800;
+}
+
+.help-section-symbol {
+    width: 23px;
+    height: 23px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    flex: 0 0 auto;
+
+    background: rgba(99, 102, 241, 0.13);
+    border: 1px solid rgba(129, 140, 248, 0.22);
+    border-radius: 7px;
+
+    color: #c7d2fe;
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 12px;
+    font-weight: 900;
+}
+
+.help-section p {
+    margin: 0;
+
+    color: #94a3b8;
+    font-size: 10px;
+    line-height: 1.55;
+}
+
+.help-section strong {
+    color: #e2e8f0;
+}
+
+.help-steps {
+    margin: 0;
+    padding-left: 18px;
+
+    color: #94a3b8;
+    font-size: 10px;
+    line-height: 1.55;
+}
+
+.help-steps li + li {
+    margin-top: 4px;
+}
+
+.help-decks {
+    display: grid;
+    gap: 8px;
+}
+
+.help-deck {
+    display: grid;
+    grid-template-columns: 94px minmax(0, 1fr);
+    gap: 10px;
+    align-items: start;
+}
+
+.help-deck-name {
+    padding: 4px 7px;
+
+    background: rgba(99, 102, 241, 0.14);
+    border: 1px solid rgba(129, 140, 248, 0.22);
+    border-radius: 7px;
+
+    color: #c7d2fe;
+    font-size: 9px;
+    font-weight: 800;
+    text-align: center;
+}
+
+.help-deck-description {
+    color: #94a3b8;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
+.help-warning {
+    margin-top: 11px;
+    padding: 11px 12px;
+
+    background: rgba(120, 53, 15, 0.35);
+    border: 1px solid rgba(245, 158, 11, 0.25);
+    border-radius: 10px;
+
+    color: #fde68a;
+    font-size: 10px;
+    line-height: 1.5;
+}
+
 .status-item {
     min-height: 29px;
     padding: 0 10px;
@@ -1549,6 +1886,63 @@ transform-origin: center bottom;
     padding: 4px;
 }
 
+.help-button {
+    min-height: 27px;
+    padding: 0 7px;
+}
+
+.help-button-text {
+    display: none;
+}
+
+.help-modal {
+    padding: 10px;
+}
+
+.help-dialog {
+    max-height: calc(100vh - 20px);
+    border-radius: 16px;
+}
+
+.help-dialog-header {
+    padding: 13px 14px;
+}
+
+.help-dialog-icon {
+    width: 31px;
+    height: 31px;
+    font-size: 14px;
+}
+
+.help-dialog-title {
+    font-size: 13px;
+}
+
+.help-dialog-subtitle {
+    display: none;
+}
+
+.help-dialog-content {
+    padding: 13px 14px 16px;
+}
+
+.help-section-grid {
+    grid-template-columns: 1fr;
+    gap: 8px;
+}
+
+.help-section-wide {
+    grid-column: auto;
+}
+
+.help-section {
+    padding: 11px;
+}
+
+.help-deck {
+    grid-template-columns: 82px minmax(0, 1fr);
+}
+
 .status-item {
     min-height: 26px;
     padding: 0 7px;
@@ -1936,6 +2330,21 @@ transform-origin: center bottom;
         </div>
 
         <div class="app-status" aria-label="Játék állapota">
+            <button
+    type="button"
+    class="help-button"
+    onclick="openHelp()"
+    title="Planning Poker súgó"
+    aria-label="Planning Poker súgó megnyitása"
+>
+    <span class="help-button-icon" aria-hidden="true">
+        ?
+    </span>
+
+    <span class="help-button-text">
+        Súgó
+    </span>
+</button>
     <div class="status-item" title="Kapcsolati állapot">
         <span
             id="connection-indicator"
@@ -2156,6 +2565,211 @@ transform-origin: center bottom;
             </div>
         </div>
     </div>
+<div
+    id="help-modal"
+    class="help-modal"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="help-dialog-title"
+    onclick="handleHelpBackdropClick(event)"
+>
+    <div class="help-dialog">
+        <div class="help-dialog-header">
+            <div class="help-dialog-heading">
+                <div class="help-dialog-icon" aria-hidden="true">
+                    ♠
+                </div>
+
+                <div>
+                    <h2
+                        id="help-dialog-title"
+                        class="help-dialog-title"
+                    >
+                        Planning Poker súgó
+                    </h2>
+
+                    <p class="help-dialog-subtitle">
+                        Rövid útmutató a közös becsléshez
+                    </p>
+                </div>
+            </div>
+
+            <button
+                type="button"
+                class="help-close-icon"
+                onclick="closeHelp()"
+                aria-label="Súgó bezárása"
+                title="Bezárás"
+            >
+                ×
+            </button>
+        </div>
+
+        <div class="help-dialog-content">
+            <p class="help-intro">
+                A Planning Poker egy közös becslési módszer.
+                A játékosok egymástól függetlenül választanak
+                egy lapot, majd a játékvezető egyszerre fedi
+                fel a szavazatokat. A cél nem pusztán egy szám
+                meghatározása, hanem a különböző szakmai
+                vélemények és bizonytalanságok feltárása.
+            </p>
+
+            <div class="help-section-grid">
+                <section class="help-section help-section-wide">
+                    <h3 class="help-section-title">
+                        <span class="help-section-symbol">1</span>
+                        Hogyan működik?
+                    </h3>
+
+                    <ol class="help-steps">
+                        <li>
+                            A játékvezető bemutatja a becslendő
+                            feladatot.
+                        </li>
+
+                        <li>
+                            A csapat tisztázza a követelményeket,
+                            függőségeket és bizonytalanságokat.
+                        </li>
+
+                        <li>
+                            Minden játékos titokban kiválasztja
+                            a saját becslését.
+                        </li>
+
+                        <li>
+                            A játékvezető egyszerre felfedi
+                            az összes szavazatot.
+                        </li>
+
+                        <li>
+                            Nagy eltérés esetén a csapat
+                            megbeszéli a különböző szempontokat,
+                            majd szükség esetén újraszavaz.
+                        </li>
+                    </ol>
+                </section>
+
+                <section class="help-section">
+                    <h3 class="help-section-title">
+                        <span class="help-section-symbol">?</span>
+                        Mit jelent a kérdőjel?
+                    </h3>
+
+                    <p>
+                        A <strong>?</strong> jelentése:
+                        nincs elegendő információm a megbízható
+                        becsléshez. Ilyenkor érdemes megállni,
+                        tisztázó kérdéseket feltenni, és csak
+                        ezután folytatni a becslést.
+                    </p>
+                </section>
+
+                <section class="help-section">
+                    <h3 class="help-section-title">
+                        <span class="help-section-symbol">☕</span>
+                        Mit jelent a kávé?
+                    </h3>
+
+                    <p>
+                        A <strong>☕</strong> azt jelzi, hogy
+                        a résztvevő rövid szünetet javasol.
+                        Nem becslési érték, ezért nem kerül bele
+                        a javasolt eredmény számításába.
+                    </p>
+                </section>
+
+                <section class="help-section help-section-wide">
+                    <h3 class="help-section-title">
+                        <span class="help-section-symbol">◇</span>
+                        A becslési skálák
+                    </h3>
+
+                    <div class="help-decks">
+                        <div class="help-deck">
+                            <div class="help-deck-name">
+                                Fibonacci
+                            </div>
+
+                            <div class="help-deck-description">
+                                Relatív becslés jól értett,
+                                sprintközeli story-khoz. A növekvő
+                                számközök a nagyobb feladatok
+                                növekvő bizonytalanságát jelzik.
+                            </div>
+                        </div>
+
+                        <div class="help-deck">
+                            <div class="help-deck-name">
+                                Kiterjesztett
+                            </div>
+
+                            <div class="help-deck-description">
+                                A nagyon kis feladatoktól a nagy,
+                                bizonytalan munkákig használható.
+                                A 20, 40 és 100 érték inkább
+                                méretkategória és figyelmeztetés,
+                                mint pontos becslés.
+                            </div>
+                        </div>
+
+                        <div class="help-deck">
+                            <div class="help-deck-name">
+                                T-Shirt
+                            </div>
+
+                            <div class="help-deck-description">
+                                Gyors, magas szintű relatív
+                                összehasonlításhoz. Akkor hasznos,
+                                amikor még nem indokolt numerikus
+                                pontosságot használni.
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="help-section">
+                    <h3 class="help-section-title">
+                        <span class="help-section-symbol">40</span>
+                        Miért ugrik 40-ről 100-ra?
+                    </h3>
+
+                    <p>
+                        Nagy feladatoknál a becslés egyre
+                        bizonytalanabb. A nagy ugrás szándékosan
+                        kerüli a hamis pontosságot. A 40 és 100
+                        inkább azt jelzi, hogy a munka túl nagy
+                        vagy túl kevéssé ismert egy pontosabb
+                        becsléshez.
+                    </p>
+                </section>
+
+                <section class="help-section">
+                    <h3 class="help-section-title">
+                        <span class="help-section-symbol">✂</span>
+                        Mikor bontsuk fel a story-t?
+                    </h3>
+
+                    <p>
+                        Érdemes felbontani, ha a feladat nem fér
+                        várhatóan egy sprintbe, több önálló üzleti
+                        eredményt tartalmaz, sok ismeretlen
+                        függősége van, vagy a szavazatok között
+                        nagyon nagy eltérés alakul ki.
+                    </p>
+                </section>
+            </div>
+
+            <div class="help-warning">
+                <strong>Fontos:</strong>
+                a választott szám relatív méretet, komplexitást
+                és bizonytalanságot fejez ki. Nem feltétlenül
+                jelent órát vagy munkanapot.
+            </div>
+        </div>
+    </div>
+</div>
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
@@ -2263,7 +2877,34 @@ socket.on('connect_error', () => {
                 .querySelectorAll('.card')
                 .forEach(card => card.classList.remove('selected'));
         }
+function openHelp() {
+    const helpModal =
+        document.getElementById('help-modal');
 
+    helpModal.classList.add('open');
+    document.body.style.overflow = 'hidden';
+
+    const closeButton =
+        helpModal.querySelector('.help-close-icon');
+
+    if (closeButton) {
+        closeButton.focus();
+    }
+}
+
+function closeHelp() {
+    const helpModal =
+        document.getElementById('help-modal');
+
+    helpModal.classList.remove('open');
+    document.body.style.overflow = '';
+}
+
+function handleHelpBackdropClick(event) {
+    if (event.target.id === 'help-modal') {
+        closeHelp();
+    }
+}
         socket.on('joinError', ({message}) => {
             const joinButton = document.getElementById('join-button');
             const loginError = document.getElementById('login-error');
@@ -2700,6 +3341,16 @@ if (s.tasks.length === 0) {
                         join();
                     }
                 });
+                document.addEventListener('keydown', event => {
+    if (
+        event.key === 'Escape' &&
+        document
+            .getElementById('help-modal')
+            .classList.contains('open')
+    ) {
+        closeHelp();
+    }
+});
         });
     </script>
 </body>
