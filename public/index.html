@@ -3,41 +3,39 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
     <title>Technical Squad Scrum Poker</title>
+
     <meta name="theme-color" content="#0f172a">
 
-<meta
-    name="apple-mobile-web-app-capable"
-    content="yes"
->
+    <meta
+        name="apple-mobile-web-app-capable"
+        content="yes"
+    >
 
-<meta
-    name="apple-mobile-web-app-status-bar-style"
-    content="black-translucent"
->
+    <meta
+        name="apple-mobile-web-app-status-bar-style"
+        content="black-translucent"
+    >
 
-<meta
-    name="apple-mobile-web-app-title"
-    content="Scrum Poker"
->
+    <meta
+        name="apple-mobile-web-app-title"
+        content="Scrum Poker"
+    >
 
-<link
-    rel="apple-touch-icon"
-    sizes="180x180"
-    hrefng"
-    sizes="192x192"
-    href="/icon-192.png"
->
+    /apple-touch-icon.png
 
-<link
-.png"
->
+    /icon-192.png
 
-<link
-    rel="manifest"
-    href="/manifest.webmanifest"
->
+    /icon-512.png
+
+    /manifest.webmanifest
+
     <style>
         :root {
             --primary: #6366f1;
@@ -1687,13 +1685,6 @@ transform-origin: center bottom;
         inset 0 0 0 1px #fffdf5;
 }
 
-.task-pending {
-    min-width: 29px;
-
-    color: #64748b;
-    font-size: 11px;
-    text-align: center;
-}
 .table-shape::before {
     content: "";
     position: absolute;
@@ -3280,34 +3271,27 @@ if (s.tasks.length === 0) {
             : task.trim();
 
         item.innerHTML = `
-            <span class="task-number">
-                ${index + 1}
-            </span>
+    <span class="task-number">
+        ${index + 1}
+    </span>
 
-            <span class="task-name">
-                ${task.trim()}
-            </span>
+    <span class="task-name">
+        ${task.trim()}
+    </span>
 
-            ${
-                result !== null
-                    ? `
-                        <span
-                            class="task-result"
-                            title="Becsült érték"
-                        >
-                            ${result}
-                        </span>
-                    `
-                    : `
-                        <span
-                            class="task-pending"
-                            title="Még nincs eredmény"
-                        >
-                            •
-                        </span>
-                    `
-            }
-        `;
+    ${
+        result !== null
+            ? `
+                <span
+                    class="task-result"
+                    title="Becsült érték"
+                >
+                    ${result}
+                </span>
+            `
+            : ''
+    }
+`;
 
         if (isSM) {
             item.onclick = () => {
