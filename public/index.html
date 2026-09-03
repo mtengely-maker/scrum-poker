@@ -2344,6 +2344,48 @@ transform-origin: center bottom;
         resize: none;
     }
 }
+/* Laptopos bejelentkezőpanel helyreállítása */
+@media (min-width: 769px) {
+    .container {
+        min-width: 0;
+        min-height: 0;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    #login-screen {
+        display: block;
+        flex: 0 0 auto;
+        max-height: calc(100vh - 106px);
+        margin: auto;
+        overflow-x: hidden;
+        overflow-y: auto;
+    }
+
+    #login-screen .login-form {
+        display: flex;
+        visibility: visible;
+        opacity: 1;
+    }
+
+    #login-screen .login-field {
+        display: flex;
+        visibility: visible;
+        opacity: 1;
+    }
+
+    #role-select {
+        display: block;
+        visibility: visible;
+        opacity: 1;
+    }
+
+    #join-button {
+        display: inline-flex;
+        visibility: visible;
+        opacity: 1;
+    }
+}
     </style>
 </head>
 
