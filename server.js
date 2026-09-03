@@ -1,10 +1,29 @@
 const express = require('express');
 const http = require('http');
+const path = require('path');
 const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    path: '/realtime/',
+    transports: [
+        'polling',
+        'websocket'
+    ]
+});
+
+app.get('/realtime-client.js', (req, res) => {
+    res.sendFile(
+        path.join(
+            __dirname,
+            'node_modules',
+            'socket.io',
+            'client-dist',
+            'socket.io.js'
+        )
+    );
+});
 
 app.use(express.static('public'));
 

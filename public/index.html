@@ -2852,14 +2852,14 @@ transform-origin: center bottom;
     </div>
 </div>
 
-    <script src="/socket.io/socket.io.js"></script>
+    <script src="/realtime-client.jsscript"></script>
     <script>
         const socket = io({
-    autoConnect: false,
-    reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 1000,
-    timeout: 20000
+    path: '/realtime/',
+    transports: [
+        'polling',
+        'websocket'
+    ]
 });
 
 const connectionIndicator =
