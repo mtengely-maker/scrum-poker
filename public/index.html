@@ -2854,40 +2854,64 @@ transform-origin: center bottom;
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
-        const connectionIndicator =
+        const socket = io({
+    autoConnect: false,
+    reconnection: true,
+    reconnectionAttempts: Infinity,
+    reconnectionDelay: 1000,
+    timeout: 20000
+});
+
+const connectionIndicator =
     document.getElementById('connection-indicator');
 
 const connectionStatus =
     document.getElementById('connection-status');
 
-function updateConnectionStatus(isConnected) {
-    connectionIndicator.classList.toggle(
+function updateConnectionStatus(status) {
+    connectionIndicator.classList.remove(
         'connected',
-        isConnected
+        'disconnected'
     );
 
-    connectionIndicator.classList.toggle(
-        'disconnected',
-        !isConnected
-    );
+    if (status === 'connected') {
+        connectionIndicator.classList.add('connected');
+        connectionStatus.innerText = 'Kapcsolódva';
+        return;
+    }
 
-    connectionStatus.innerText = isConnected
-        ? 'Kapcsolódva'
-        : 'Nincs kapcsolat';
+    if (status === 'disconnected') {
+        connectionIndicator.classList.add('disconnected');
+        connectionStatus.innerText = 'Nincs kapcsolat';
+        return;
+    }
+
+    connectionStatus.innerText = 'Kapcsolódás...';
 }
 
 socket.on('connect', () => {
-    updateConnectionStatus(true);
+    updateConnectionStatus('connected');
 });
 
 socket.on('disconnect', () => {
-    updateConnectionStatus(false);
+    updateConnectionStatus('disconnected');
 });
 
-socket.on('connect_error', () => {
-    updateConnectionStatus(false);
+socket.on('connect_error', error => {
+    console.error(
+        'Socket.IO kapcsolódási hiba:',
+        error.message
+    );
+
+    updateConnectionStatus('disconnected');
 });
+
+socket.io.on('reconnect_attempt', () => {
+    updateConnectionStatus('connecting');
+});
+
+updateConnectionStatus('connecting');
+socket.connect();
         const decks = {
             fibonacci: ['1', '2', '3', '5', '8', '13', '21', '?', '☕'],
             extended: ['0', '0.5', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', '☕'],
@@ -2895,34 +2919,62 @@ socket.on('connect_error', () => {
         };
 
         function join() {
-            const nameInput = document.getElementById('username');
-            const roleSelect = document.getElementById('role-select');
-            const joinButton = document.getElementById('join-button');
-            const loginError = document.getElementById('login-error');
+    const nameInput =
+        document.getElementById('username');
 
-            const name = nameInput.value.trim();
-            const role = roleSelect.value === 'facilitator'
-                ? 'facilitator'
-                : 'player';
+    const roleSelect =
+        document.getElementById('role-select');
 
-            loginError.style.display = 'none';
-            loginError.innerText = '';
+    const joinButton =
+        document.getElementById('join-button');
 
-            if (!name) {
-                loginError.innerText = 'Add meg a nevedet!';
-                loginError.style.display = 'block';
-                nameInput.focus();
-                return;
-            }
+    const loginError =
+        document.getElementById('login-error');
 
-            joinButton.disabled = true;
-            joinButton.innerText = 'Belépés...';
+    const name = nameInput.value.trim();
 
-            socket.emit('join', {
-                name,
-                role
-            });
-        }
+    const role =
+        roleSelect.value === 'facilitator'
+            ? 'facilitator'
+            : 'player';
+
+    loginError.style.display = 'none';
+    loginError.innerText = '';
+
+    if (!name) {
+        loginError.innerText =
+            'Add meg a nevedet!';
+
+        loginError.style.display = 'block';
+        nameInput.focus();
+
+        return;
+    }
+
+    if (!socket.connected) {
+        loginError.innerText =
+            'A szerverkapcsolat még nem áll készen. Várj néhány másodpercet, majd próbáld újra.';
+
+        loginError.style.display = 'block';
+
+        updateConnectionStatus('connecting');
+        socket.connect();
+
+        return;
+    }
+
+    joinButton.disabled = true;
+
+    joinButton.innerHTML = `
+        <span aria-hidden="true">…</span>
+        <span>Belépés...</span>
+    `;
+
+    socket.emit('join', {
+        name,
+        role
+    });
+}
 
         socket.on('joinSuccess', ({player}) => {
             const joinButton = document.getElementById('join-button');
@@ -2930,7 +2982,10 @@ socket.on('connect_error', () => {
             const loginError = document.getElementById('login-error');
 
             joinButton.disabled = false;
-            joinButton.innerText = 'Belépés';
+            joinButton.innerHTML = `
+    <span aria-hidden="true">→</span>
+    <span>Belépés</span>
+`;
 
             loginError.style.display = 'none';
             loginError.innerText = '';
@@ -2991,7 +3046,10 @@ function handleHelpBackdropClick(event) {
             const loginError = document.getElementById('login-error');
 
             joinButton.disabled = false;
-            joinButton.innerText = 'Belépés';
+            joinButton.innerHTML = `
+    <span aria-hidden="true">→</span>
+    <span>Belépés</span>
+`;
 
             loginError.innerText =
                 message || 'A belépés nem sikerült.';
