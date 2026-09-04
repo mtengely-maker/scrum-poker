@@ -2852,15 +2852,9 @@ transform-origin: center bottom;
     </div>
 </div>
 
-    <script src="/realtime-client.jsscript"></script>
+    <script src="/socket.io/socket.io.jsscript"></script>
     <script>
-        const socket = io({
-    path: '/realtime/',
-    transports: [
-        'polling',
-        'websocket'
-    ]
-});
+        const socket = io();
 
 const connectionIndicator =
     document.getElementById('connection-indicator');
@@ -2906,12 +2900,6 @@ socket.on('connect_error', error => {
     updateConnectionStatus('disconnected');
 });
 
-socket.io.on('reconnect_attempt', () => {
-    updateConnectionStatus('connecting');
-});
-
-updateConnectionStatus('connecting');
-socket.connect();
         const decks = {
             fibonacci: ['1', '2', '3', '5', '8', '13', '21', '?', '☕'],
             extended: ['0', '0.5', '1', '2', '3', '5', '8', '13', '20', '40', '100', '?', '☕'],
@@ -2947,19 +2935,6 @@ socket.connect();
 
         loginError.style.display = 'block';
         nameInput.focus();
-
-        return;
-    }
-
-    if (!socket.connected) {
-        loginError.innerText =
-            'A szerverkapcsolat még nem áll készen. Várj néhány másodpercet, majd próbáld újra.';
-
-        loginError.style.display = 'block';
-
-        updateConnectionStatus('connecting');
-        socket.connect();
-
         return;
     }
 
