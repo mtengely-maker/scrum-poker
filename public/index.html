@@ -9,7 +9,7 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Test12345</title>
+    <title>Technical Squad Scrum Poker</title>
 
     <meta name="theme-color" content="#0f172a">
 
@@ -2854,10 +2854,7 @@ transform-origin: center bottom;
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io({
-    path: '/realtime/',
-    transports: ['websocket', 'polling']
-});
+        const socket = io();
 
 socket.on('connect', () => {
     alert('CONNECTED: ' + socket.id);
