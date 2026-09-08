@@ -2854,7 +2854,18 @@ transform-origin: center bottom;
 
     <script src="/socket.io/socket.io.js"></script>
     <script>
-        const socket = io();
+        const socket = io({
+    path: '/realtime/',
+    transports: ['websocket', 'polling']
+});
+
+socket.on('connect', () => {
+    alert('CONNECTED: ' + socket.id);
+});
+
+socket.on('connect_error', (err) => {
+    alert('ERROR: ' + err.message);
+});
 
 const connectionIndicator =
     document.getElementById('connection-indicator');
