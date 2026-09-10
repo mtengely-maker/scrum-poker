@@ -2630,6 +2630,7 @@ transform-origin: center bottom;
         </div>
 
         <div id="avg-display"></div>
+        <div id="consensus-display"></div>
     </div>
 </div>
 
@@ -3209,6 +3210,56 @@ socket.emit('vote', value);
             return closest;
         }
 
+        function getConsensusLevel(votes, deckType) {
+
+    const deck = decks[deckType] || decks.fibonacci;
+
+    const numericVotes = votes
+        .filter(v => !isNaN(v))
+        .map(v => String(v));
+
+    if (numericVotes.length < 2) {
+        return {
+            icon: '🟢',
+            text: 'Erős konszenzus'
+        };
+    }
+
+    const indexes = numericVotes
+        .map(v => deck.indexOf(v))
+        .filter(index => index >= 0);
+
+    if (indexes.length < 2) {
+        return {
+            icon: '🟢',
+            text: 'Erős konszenzus'
+        };
+    }
+
+    const spread =
+        Math.max(...indexes) -
+        Math.min(...indexes);
+
+    if (spread <= 1) {
+        return {
+            icon: '🟢',
+            text: 'Erős konszenzus'
+        };
+    }
+
+    if (spread <= 3) {
+        return {
+            icon: '🟡',
+            text: 'Közepes eltérés'
+        };
+    }
+
+    return {
+        icon: '🔴',
+        text: 'Jelentős eltérés'
+    };
+}
+
         socket.on('state', (s) => {
             const isSM = s.players[socket.id]?.isSM;
             const selectedVote = s.players[socket.id]?.vote ?? null;
@@ -3245,6 +3296,9 @@ activeDeckNameElement.innerText =
 const averageDisplayElement =
     document.getElementById('avg-display');
 
+    const consensusDisplayElement =
+    document.getElementById('consensus-display');
+
 const tableShapeElement =
     document.querySelector('.table-shape');
 
@@ -3276,8 +3330,9 @@ if (hasRevealedResult) {
                     averageDisplayElement.innerText = '-';
                 }
             } else {
-                averageDisplayElement.innerText = '';
-            }
+    averageDisplayElement.innerText = '';
+    consensusDisplayElement.innerText = '';
+}
 
             const tableArea = document.getElementById('table-area');
             document.querySelectorAll('.seat').forEach(el => el.remove());
@@ -3299,6 +3354,13 @@ if (s.revealed) {
         minimumVote = Math.min(...numericVotes);
         maximumVote = Math.max(...numericVotes);
     }
+    const consensus = getConsensusLevel(
+    rawVotes,
+    s.cardDeckType
+);
+
+consensusDisplayElement.innerText =
+    `${consensus.icon} ${consensus.text}`;
 }
             players.forEach((p, i) => {
                 const angle = (i / players.length) * 2 * Math.PI - Math.PI / 2;
