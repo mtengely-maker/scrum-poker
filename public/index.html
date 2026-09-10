@@ -3283,6 +3283,23 @@ if (hasRevealedResult) {
             document.querySelectorAll('.seat').forEach(el => el.remove());
 
             const players = Object.values(s.players);
+            let minimumVote = null;
+let maximumVote = null;
+
+if (s.revealed) {
+    const numericVotes = players
+        .filter(player =>
+            !player.isSM &&
+            player.vote !== null &&
+            !isNaN(player.vote)
+        )
+        .map(player => Number(player.vote));
+
+    if (numericVotes.length > 0) {
+        minimumVote = Math.min(...numericVotes);
+        maximumVote = Math.max(...numericVotes);
+    }
+}
             players.forEach((p, i) => {
                 const angle = (i / players.length) * 2 * Math.PI - Math.PI / 2;
                 const radiusX = 130;
@@ -3298,8 +3315,27 @@ if (p.isSM) {
     statusText = 'Játékvezető';
     statusClass = 'player-status-facilitator';
 } else if (s.revealed && p.vote) {
-    statusText = p.vote;
+
+    const numericVote = Number(p.vote);
+
+    if (
+        minimumVote !== null &&
+        numericVote === minimumVote
+    ) {
+        statusText = `⬇ ${p.vote}`;
+    }
+    else if (
+        maximumVote !== null &&
+        numericVote === maximumVote
+    ) {
+        statusText = `⬆ ${p.vote}`;
+    }
+    else {
+        statusText = p.vote;
+    }
+
     statusClass = 'player-status-revealed';
+
 } else if (p.vote) {
     statusText = 'Szavazott';
     statusClass = 'player-status-voted';
