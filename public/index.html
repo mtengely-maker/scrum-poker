@@ -2642,6 +2642,7 @@ transform-origin: center bottom;
                 </div>
                 <div id="sm-controls" style="display:none; justify-content:center; gap:10px;">
                     <button class="btn" onclick="socket.emit('reveal')" style="background:#059669;">Felfedés</button>
+                    <button id="revote-button" class="btn" onclick="socket.emit('revote')">Újraszavazás 🔄</button>
                     <button class="btn" onclick="socket.emit('nextTask')">Következő ➡</button>
                 </div>
             </div>
@@ -3269,6 +3270,9 @@ const playerCountElement =
 const activeDeckNameElement =
     document.getElementById('active-deck-name');
 
+    const revoteButton =
+    document.getElementById('revote-button');
+
 const deckNames = {
     fibonacci: 'Fibonacci',
     extended: 'Kiterjesztett',
@@ -3282,7 +3286,8 @@ activeDeckNameElement.innerText =
     deckNames[s.cardDeckType] || 'Fibonacci';
             document.getElementById('sm-panel').style.display = isSM ? 'block' : 'none';
             document.getElementById('sm-controls').style.display = isSM ? 'flex' : 'none';
-
+if (revoteButton) {revoteButton.style.display = isSM && s.revealed ? 'inline-flex': 'none';
+}
             // Scrum Master elől elrejtjük a szavazókártyákat is
             document.getElementById('cards-wrapper').style.display = isSM ? 'none' : 'block';
             

@@ -300,6 +300,31 @@ io.on('connection', socket => {
         emitState();
     });
 
+socket.on('revote', () => {
+
+    const player = state.players[socket.id];
+
+    if (!player || !player.isSM) {
+
+        socket.emit('actionError', {
+            code: 'FACILITATOR_ONLY',
+            message: 'Csak a játékvezető indíthat újraszavazást.'
+        });
+
+        return;
+    }
+
+    state.revealed = false;
+
+    Object.values(state.players).forEach(
+        currentPlayer => {
+            currentPlayer.vote = null;
+        }
+    );
+
+    emitState();
+});
+
     socket.on('nextTask', () => {
         const player = state.players[socket.id];
 
