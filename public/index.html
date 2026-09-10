@@ -2662,6 +2662,7 @@ transform-origin: center bottom;
                 <div id="sm-controls" style="display:none; justify-content:center; gap:10px;">
                     <button class="btn" onclick="socket.emit('reveal')" style="background:#059669;">Felfedés</button>
                     <button id="revote-button" class="btn" onclick="socket.emit('revote')">Újraszavazás 🔄</button>
+                    <button class="btn" onclick="socket.emit('acceptConsensus')" style="background:#059669;">Konszenzus elfogadása ✓</button>
                     <button class="btn" onclick="socket.emit('nextTask')">Következő ➡</button>
                 </div>
             </div>
@@ -3283,7 +3284,16 @@ socket.emit('vote', value);
         socket.on('state', (s) => {
             const isSM = s.players[socket.id]?.isSM;
             const selectedVote = s.players[socket.id]?.vote ?? null;
-const playerCountElement =
+const acceptButton =
+    document.getElementById(
+        'accept-consensus-button'
+    );
+
+if (acceptButton) {
+    acceptButton.style.display =
+        s.revealed ? 'inline-flex' : 'none';
+}
+            const playerCountElement =
     document.getElementById('player-count');
 
 const activeDeckNameElement =
@@ -3305,6 +3315,17 @@ activeDeckNameElement.innerText =
     deckNames[s.cardDeckType] || 'Fibonacci';
             document.getElementById('sm-panel').style.display = isSM ? 'block' : 'none';
             document.getElementById('sm-controls').style.display = isSM ? 'flex' : 'none';
+            const acceptConsensusButton =
+    document.getElementById(
+        'accept-consensus-button'
+    );
+
+if (acceptConsensusButton) {
+    acceptConsensusButton.style.display =
+        isSM && s.revealed
+            ? 'inline-flex'
+            : 'none';
+}
 if (revoteButton) {revoteButton.style.display = isSM && s.revealed ? 'inline-flex': 'none';
 }
             // Scrum Master elől elrejtjük a szavazókártyákat is

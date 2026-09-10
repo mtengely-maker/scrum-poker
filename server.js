@@ -15,6 +15,7 @@ let state = {
     currentTaskIndex: 0,
     revealed: false,
     taskResults: {},
+    acceptedEstimates: {},
     cardDeckType: 'fibonacci'
 };
 
@@ -321,6 +322,38 @@ socket.on('revote', () => {
             currentPlayer.vote = null;
         }
     );
+
+    emitState();
+});
+
+socket.on('acceptConsensus', () => {
+
+    const player = state.players[socket.id];
+
+    if (!player || !player.isSM) {
+
+        socket.emit('actionError', {
+            code: 'FACILITATOR_ONLY',
+            message:
+                'Csak a játékvezető fogadhat el konszenzust.'
+        });
+
+        return;
+    }
+
+    const votes =
+        state.taskResults[state.currentTaskIndex];
+
+    if (
+        !Array.isArray(votes) ||
+        votes.length === 0
+    ) {
+        return;
+    }
+
+    state.acceptedEstimates[
+        state.currentTaskIndex
+    ] = votes;
 
     emitState();
 });
