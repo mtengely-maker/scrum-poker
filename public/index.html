@@ -1135,7 +1135,7 @@
     flex-grow: 1;
     position: relative;
     width: 100%;
-    min-height: 200px;
+    min-height: 320px;
 
     display: flex;
     justify-content: center;
@@ -1146,8 +1146,8 @@
 
         .table-shape {
     position: relative;
-    width: 375px;
-    height: 200px;
+    width: 420px;
+    height: 260px;
     overflow: hidden;
 
     display: flex;
@@ -1775,10 +1775,10 @@ transform-origin: center bottom;
     position: relative;
     z-index: 2;
 
-    width: 68px;
-    height: 94px;
-    min-width: 68px;
-    min-height: 94px;
+    width: 60px;
+    height: 84px;
+    min-width: 60px;
+    min-height: 84px;
     flex: 0 0 auto;
 
     display: flex;
@@ -2215,6 +2215,17 @@ transform-origin: center bottom;
     padding: 0;
 
     font-size: 1.65rem;
+}
+
+#consensus-display {
+    margin-top: 10px;
+
+    color: #ecfdf5;
+    font-size: 0.85rem;
+    font-weight: 700;
+    line-height: 1.2;
+
+    text-align: center;
 }
 
             .cards-container {
@@ -3400,8 +3411,8 @@ if (s.revealed) {
 }
             players.forEach((p, i) => {
                 const angle = (i / players.length) * 2 * Math.PI - Math.PI / 2;
-                const radiusX = 170;
-                const radiusY = 105;
+                const radiusX = 180;
+                const radiusY = 130;
                 const x = Math.cos(angle) * radiusX;
                 const y = Math.sin(angle) * radiusY;
 
