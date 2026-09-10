@@ -1146,8 +1146,8 @@
 
         .table-shape {
     position: relative;
-    width: 300px;
-    height: 160px;
+    width: 375px;
+    height: 200px;
     overflow: hidden;
 
     display: flex;
@@ -1284,7 +1284,7 @@
 
 .seat-name {
     max-width: 92px;
-    margin-top: 5px;
+    margin-top: 7px;
     padding: 3px 8px;
 
     overflow: hidden;
@@ -1305,7 +1305,7 @@
 
 .player-status {
     min-width: 58px;
-    margin-top: 3px;
+    margin-top: 5px;
     padding: 3px 7px;
 
     box-sizing: border-box;
@@ -1843,6 +1843,14 @@ transform-origin: center bottom;
     transform: rotate(180deg);
 }
 
+#consensus-display {
+    margin-top: 10px;
+    margin-bottom: 12px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
 .table-shape.result-revealed #task-title {
     display: none;
 }
@@ -2145,8 +2153,8 @@ transform-origin: center bottom;
 }
 
             .table-shape {
-    width: 240px;
-    height: 130px;
+    width: 300px;
+    height: 162px;
     padding: 14px 22px;
     border-width: 4px;
 }
@@ -2171,14 +2179,14 @@ transform-origin: center bottom;
 
 .seat-name {
     max-width: 76px;
-    margin-top: 3px;
+    margin-top: 5px;
     padding: 2px 6px;
     font-size: 9px;
 }
 
 .player-status {
     min-width: 52px;
-    margin-top: 2px;
+    margin-top: 4px;
     padding: 2px 6px;
     font-size: 8px;
 }
@@ -3392,8 +3400,8 @@ if (s.revealed) {
 }
             players.forEach((p, i) => {
                 const angle = (i / players.length) * 2 * Math.PI - Math.PI / 2;
-                const radiusX = 130;
-                const radiusY = 75;
+                const radiusX = 170;
+                const radiusY = 105;
                 const x = Math.cos(angle) * radiusX;
                 const y = Math.sin(angle) * radiusY;
 
