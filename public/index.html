@@ -3317,19 +3317,49 @@ tableShapeElement.classList.toggle(
 );
 
 if (hasRevealedResult) {
-                const rawVotes = s.taskResults[s.currentTaskIndex].filter(v => v !== null && v !== undefined);
-                const numericVals = rawVotes.filter(v => !isNaN(v)).map(v => parseFloat(v));
 
-                if (numericVals.length > 0) {
-                    const recommended = getClosestValue(numericVals, s.cardDeckType);
-                    averageDisplayElement.innerText = recommended;
-                } else if (rawVotes.length > 0) {
-                    const recommended = getClosestValue(rawVotes, s.cardDeckType);
-                    averageDisplayElement.innerText = recommended;
-                } else {
-                    averageDisplayElement.innerText = '-';
-                }
-            } else {
+    const rawVotes = s.taskResults[s.currentTaskIndex]
+        .filter(v => v !== null && v !== undefined);
+
+    const numericVals = rawVotes
+        .filter(v => !isNaN(v))
+        .map(v => parseFloat(v));
+
+    if (numericVals.length > 0) {
+
+        const recommended = getClosestValue(
+            numericVals,
+            s.cardDeckType
+        );
+
+        averageDisplayElement.innerText =
+            recommended;
+
+    } else if (rawVotes.length > 0) {
+
+        const recommended = getClosestValue(
+            rawVotes,
+            s.cardDeckType
+        );
+
+        averageDisplayElement.innerText =
+            recommended;
+
+    } else {
+
+        averageDisplayElement.innerText = '-';
+    }
+
+    const consensus = getConsensusLevel(
+        rawVotes,
+        s.cardDeckType
+    );
+
+    consensusDisplayElement.innerText =
+        `${consensus.icon} ${consensus.text}`;
+
+} else {
+
     averageDisplayElement.innerText = '';
     consensusDisplayElement.innerText = '';
 }
@@ -3354,13 +3384,6 @@ if (s.revealed) {
         minimumVote = Math.min(...numericVotes);
         maximumVote = Math.max(...numericVotes);
     }
-    const consensus = getConsensusLevel(
-    rawVotes,
-    s.cardDeckType
-);
-
-consensusDisplayElement.innerText =
-    `${consensus.icon} ${consensus.text}`;
 }
             players.forEach((p, i) => {
                 const angle = (i / players.length) * 2 * Math.PI - Math.PI / 2;
