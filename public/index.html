@@ -2939,6 +2939,15 @@ socket.on('connect_error', error => {
     const nameInput =
         document.getElementById('username');
 
+        const savedName =
+    localStorage.getItem(
+        'scrumPokerLastName'
+    );
+
+if (savedName) {
+    nameInput.value = savedName;
+}
+
     const roleSelect =
         document.getElementById('role-select');
 
@@ -2998,6 +3007,11 @@ socket.on('connect_error', error => {
                 'scrumPokerLastRole',
                 player.role || roleSelect.value || 'player'
             );
+
+            localStorage.setItem(
+    'scrumPokerLastName',
+    player.name
+);
 
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('game-screen').style.display = 'flex';

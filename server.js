@@ -147,6 +147,13 @@ io.on('connection', socket => {
             return;
         }
 
+        const existingPlayerEntry =
+    Object.entries(state.players)
+        .find(
+            ([, player]) =>
+                player.name === name
+        );
+
         state.players[socket.id] = {
             name,
             role: requestedRole,
@@ -162,6 +169,29 @@ io.on('connection', socket => {
 
         emitState();
     });
+
+    if (existingPlayerEntry) {
+
+    const oldSocketId =
+        existingPlayerEntry[0];
+
+    const existingPlayer =
+        existingPlayerEntry[1];
+
+    state.players[socket.id] =
+        existingPlayer;
+
+    delete state.players[oldSocketId];
+
+    socket.emit('joinSuccess', {
+        playerId: socket.id,
+        player: existingPlayer
+    });
+
+    emitState();
+
+    return;
+}
 
     socket.on('changeRole', requestedRole => {
         const player = state.players[socket.id];
@@ -448,19 +478,21 @@ socket.on('acceptConsensus', () => {
     });
 
     socket.on('disconnect', () => {
-        delete state.players[socket.id];
 
-        /*
-         * Szándékosan nem nevezünk ki automatikusan
-         * új játékvezetőt.
-         *
-         * Ha a játékvezető kilép, a szerepkör szabaddá válik,
-         * és egy jelenlegi játékos a changeRole eseménnyel
-         * átveheti azt.
-         */
+    setTimeout(() => {
 
-        emitState();
-    });
+        const player =
+            state.players[socket.id];
+
+        if (player) {
+
+            delete state.players[socket.id];
+
+            emitState();
+        }
+
+    }, 30 * 60 * 1000);
+
 });
 
 const PORT = process.env.PORT || 3000;
