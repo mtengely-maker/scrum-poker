@@ -3298,15 +3298,7 @@ socket.emit('vote', value);
         socket.on('state', (s) => {
             const isSM = s.players[socket.id]?.isSM;
             const selectedVote = s.players[socket.id]?.vote ?? null;
-const acceptButton =
-    document.getElementById(
-        'accept-consensus-button'
-    );
 
-if (acceptButton) {
-    acceptButton.style.display =
-        s.revealed ? 'inline-flex' : 'none';
-}
             const playerCountElement =
     document.getElementById('player-count');
 
@@ -3338,13 +3330,6 @@ activeDeckNameElement.innerText =
     document.getElementById(
         'accept-consensus-button'
     );
-
-if (acceptConsensusButton) {
-    acceptConsensusButton.style.display =
-        isSM && s.revealed
-            ? 'inline-flex'
-            : 'none';
-}
 
 if (revoteButton) {revoteButton.style.display = isSM && s.revealed ? 'inline-flex': 'none';
 }
