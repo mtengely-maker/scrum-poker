@@ -5,7 +5,12 @@ const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+    connectionStateRecovery: {
+        maxDisconnectionDuration: 30 * 60 * 1000,
+        skipMiddlewares: false
+    }
+});
 
 app.use(express.static('public'));
 
@@ -415,19 +420,15 @@ socket.on('revote', () => {
     });
 
     socket.on('disconnect', () => {
-        delete state.players[socket.id];
+    const disconnectedSocketId = socket.id;
 
-        /*
-         * Szándékosan nem nevezünk ki automatikusan
-         * új játékvezetőt.
-         *
-         * Ha a játékvezető kilép, a szerepkör szabaddá válik,
-         * és egy jelenlegi játékos a changeRole eseménnyel
-         * átveheti azt.
-         */
-
-        emitState();
-    });
+    setTimeout(() => {
+        if (state.players[disconnectedSocketId]) {
+            delete state.players[disconnectedSocketId];
+            emitState();
+        }
+    }, 30 * 60 * 1000);
+});
 });
 
 const PORT = process.env.PORT || 3000;
