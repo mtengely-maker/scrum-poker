@@ -15,7 +15,6 @@ let state = {
     currentTaskIndex: 0,
     revealed: false,
     taskResults: {},
-    acceptedEstimates: {},
     cardDeckType: 'fibonacci'
 };
 
@@ -326,38 +325,6 @@ socket.on('revote', () => {
     emitState();
 });
 
-socket.on('acceptConsensus', () => {
-
-    const player = state.players[socket.id];
-
-    if (!player || !player.isSM) {
-
-        socket.emit('actionError', {
-            code: 'FACILITATOR_ONLY',
-            message:
-                'Csak a játékvezető fogadhat el konszenzust.'
-        });
-
-        return;
-    }
-
-    const votes =
-        state.taskResults[state.currentTaskIndex];
-
-    if (
-        !Array.isArray(votes) ||
-        votes.length === 0
-    ) {
-        return;
-    }
-
-    state.acceptedEstimates[
-        state.currentTaskIndex
-    ] = votes;
-
-    emitState();
-});
-
     socket.on('nextTask', () => {
         const player = state.players[socket.id];
 
@@ -448,23 +415,19 @@ socket.on('acceptConsensus', () => {
     });
 
     socket.on('disconnect', () => {
+        delete state.players[socket.id];
 
-    setTimeout(() => {
+        /*
+         * Szándékosan nem nevezünk ki automatikusan
+         * új játékvezetőt.
+         *
+         * Ha a játékvezető kilép, a szerepkör szabaddá válik,
+         * és egy jelenlegi játékos a changeRole eseménnyel
+         * átveheti azt.
+         */
 
-        const player =
-            state.players[socket.id];
-
-        if (player) {
-
-            delete state.players[socket.id];
-
-            emitState();
-        }
-
-    }, 30 * 60 * 1000);
-
-});
-
+        emitState();
+    });
 });
 
 const PORT = process.env.PORT || 3000;
