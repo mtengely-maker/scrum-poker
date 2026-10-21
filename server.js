@@ -163,7 +163,7 @@ io.on('connection', socket => {
             role: requestedRole,
             isSM: requestedRole === 'facilitator',
             vote: null,
-            emoji: getAvailableEmoji()
+            emoji: getAvailableEmoji(),
             connected: true
         };
 
