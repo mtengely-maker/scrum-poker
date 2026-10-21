@@ -7,7 +7,7 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
     connectionStateRecovery: {
-        maxDisconnectionDuration: 30 * 60 * 1000,
+        maxDisconnectionDuration: 60 * 60 * 1000,
         skipMiddlewares: false
     }
 });
@@ -108,6 +108,13 @@ function emitState() {
 }
 
 io.on('connection', socket => {
+    if (
+    socket.recovered &&
+    state.players[socket.id]
+) {
+    state.players[socket.id].connected = true;
+    emitState();
+}
     socket.on('join', payload => {
         const joinData =
             typeof payload === 'string'
@@ -157,6 +164,7 @@ io.on('connection', socket => {
             isSM: requestedRole === 'facilitator',
             vote: null,
             emoji: getAvailableEmoji()
+            connected: true
         };
 
         socket.emit('joinSuccess', {
@@ -215,6 +223,48 @@ io.on('connection', socket => {
 
         emitState();
     });
+
+    socket.on('removePlayer', targetSocketId => {
+    const facilitator =
+        state.players[socket.id];
+
+    if (!facilitator || !facilitator.isSM) {
+        socket.emit('actionError', {
+            code: 'FACILITATOR_ONLY',
+            message:
+                'Csak a játékvezető távolíthat el játékost.'
+        });
+
+        return;
+    }
+
+    const targetPlayer =
+        state.players[targetSocketId];
+
+    if (!targetPlayer) {
+        socket.emit('actionError', {
+            code: 'PLAYER_NOT_FOUND',
+            message:
+                'Az eltávolítandó játékos nem található.'
+        });
+
+        return;
+    }
+
+    if (targetPlayer.connected !== false) {
+        socket.emit('actionError', {
+            code: 'PLAYER_STILL_CONNECTED',
+            message:
+                'Csak lekapcsolódott játékos távolítható el.'
+        });
+
+        return;
+    }
+
+    delete state.players[targetSocketId];
+
+    emitState();
+});
 
     socket.on('addTasks', payload => {
         const player = state.players[socket.id];
@@ -422,12 +472,26 @@ socket.on('revote', () => {
     socket.on('disconnect', () => {
     const disconnectedSocketId = socket.id;
 
+    const disconnectedPlayer =
+        state.players[disconnectedSocketId];
+
+    if (disconnectedPlayer) {
+        disconnectedPlayer.connected = false;
+        emitState();
+    }
+
     setTimeout(() => {
-        if (state.players[disconnectedSocketId]) {
+        const player =
+            state.players[disconnectedSocketId];
+
+        if (
+            player &&
+            player.connected === false
+        ) {
             delete state.players[disconnectedSocketId];
             emitState();
         }
-    }, 30 * 60 * 1000);
+    }, 60 * 60 * 1000);
 });
 });
 

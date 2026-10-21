@@ -1303,6 +1303,56 @@
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.24);
 }
 
+.seat-offline {
+    opacity: 0.52;
+    filter: grayscale(0.55);
+}
+
+.seat-offline .avatar {
+    border-color: #64748b;
+    box-shadow:
+        0 7px 14px rgba(0, 0, 0, 0.28),
+        0 0 0 3px rgba(100, 116, 139, 0.12);
+}
+
+.player-status-offline {
+    color: #cbd5e1;
+    background: rgba(51, 65, 85, 0.9);
+    border-color: rgba(148, 163, 184, 0.32);
+}
+
+.remove-player-button {
+    min-width: 24px;
+    height: 24px;
+    margin-top: 5px;
+    padding: 0 7px;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    box-sizing: border-box;
+
+    background: rgba(127, 29, 29, 0.82);
+    border: 1px solid rgba(251, 113, 133, 0.36);
+    border-radius: 999px;
+
+    color: #fecaca;
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1;
+
+    cursor: pointer;
+
+    box-shadow: 0 3px 7px rgba(0, 0, 0, 0.22);
+}
+
+.remove-player-button:hover {
+    background: rgba(159, 18, 57, 0.96);
+    border-color: rgba(251, 113, 133, 0.6);
+}
+
 .player-status {
     min-width: 58px;
     margin-top: 5px;
@@ -1997,6 +2047,13 @@ transform-origin: center bottom;
 .status-label {
     display: none;
 }
+
+    .remove-player-button {
+        min-width: 28px;
+        height: 28px;
+        font-size: 15px;
+    }
+
 
             .brand-logo {
                 width: 48px;
@@ -3391,7 +3448,11 @@ if (hasRevealedResult) {
             const tableArea = document.getElementById('table-area');
             document.querySelectorAll('.seat').forEach(el => el.remove());
 
-            const players = Object.values(s.players);
+            const players = Object.entries(s.players)
+    .map(([playerId, player]) => ({
+        playerId,
+        ...player
+    }));
             let minimumVote = null;
 let maximumVote = null;
 
@@ -3419,6 +3480,35 @@ if (s.revealed) {
                 // Ha Scrum Master, akkor nem szavaz, hanem bírói síp jelzést kap (🏴 vagy 🟨) státusz helyett
                 let statusText = 'Várakozik';
 let statusClass = 'player-status-waiting';
+
+if (p.connected === false) {
+    statusText = 'Offline';
+    statusClass = 'player-status-offline';
+} else if (p.isSM) {
+    statusText = 'Játékvezető';
+    statusClass = 'player-status-facilitator';
+} else if (s.revealed && p.vote) {
+    const numericVote = Number(p.vote);
+
+    if (
+        minimumVote !== null &&
+        numericVote === minimumVote
+    ) {
+        statusText = `⬇ ${p.vote}`;
+    } else if (
+        maximumVote !== null &&
+        numericVote === maximumVote
+    ) {
+        statusText = `⬆ ${p.vote}`;
+    } else {
+        statusText = p.vote;
+    }
+
+    statusClass = 'player-status-revealed';
+} else if (p.vote) {
+    statusText = 'Szavazott';
+    statusClass = 'player-status-voted';
+}
 
 if (p.isSM) {
     statusText = 'Játékvezető';
@@ -3456,8 +3546,26 @@ if (p.isSM) {
     : '';
 
                 const seat = document.createElement('div');
-                seat.className = 'seat';
+
+seat.className =
+    p.connected === false
+        ? 'seat seat-offline'
+        : 'seat';
                 seat.style.transform = `translate(${x}px, ${y}px)`;
+                const removePlayerButtonHtml =
+    isSM && p.connected === false
+        ? `
+            <button
+                type="button"
+                class="remove-player-button"
+                data-player-id="${p.playerId}"
+                title="Offline játékos eltávolítása"
+                aria-label="${p.name} eltávolítása"
+            >
+                ×
+            </button>
+        `
+        : '';
                 seat.innerHTML = `
                     <div class="avatar-container">
                         <div class="avatar" title="${p.name}">${p.emoji || '👤'}</div>
@@ -3467,7 +3575,29 @@ if (p.isSM) {
                     <div class="player-status ${statusClass}">
     ${statusText}
 </div>
-                `;
+     ${removePlayerButtonHtml}
+`;
+const removePlayerButton =
+    seat.querySelector('.remove-player-button');
+
+if (removePlayerButton) {
+    removePlayerButton.addEventListener(
+        'click',
+        () => {
+            const shouldRemove =
+                window.confirm(
+                    `${p.name} eltávolítása a játékból?`
+                );
+
+            if (shouldRemove) {
+                socket.emit(
+                    'removePlayer',
+                    p.playerId
+                );
+            }
+        }
+    );
+}
                 tableArea.appendChild(seat);
             });
 
